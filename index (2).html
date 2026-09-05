@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Pendientes de la semana</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #F3F5F8;
+    --paper: #FFFFFF;
+    --ink: #262138;
+    --ink-soft: #726C8A;
+    --ink-faint: #A7A2BC;
+    --line: #ECE8F7;
+
+    --blue: #3AA8D8;
+    --blue-dark: #1F7FAE;
+    --blue-tint: #E6F5FB;
+
+    --green: #33B27E;
+    --green-dark: #1F8F62;
+    --green-tint: #E4F7EE;
+
+    --coral: #FF6F61;
+    --coral-dark: #E9503F;
+    --coral-tint: #FFE8E4;
+
+    --purple: #8A5CF6;
+    --purple-dark: #6C3FE0;
+    --purple-tint: #F1EBFE;
+
+    --yellow: #FFD166;
+
+    --material: var(--coral);
+    --material-tint: var(--coral-tint);
+    --tarea: var(--purple);
+    --tarea-tint: var(--purple-tint);
+    --actividad: var(--blue);
+    --actividad-tint: var(--blue-tint);
+
+    --radius-lg: 20px;
+    --radius-md: 14px;
+    --radius-sm: 10px;
+
+    --font-display: 'Baloo 2', 'SF Pro Rounded', system-ui, sans-serif;
+    --font-body: 'Nunito', -apple-system, 'Segoe UI', Roboto, system-ui, sans-serif;
+  }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin:0; padding:0; }
+  body{
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .bg-scene{
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(circle at 6% 6%, rgba(255,209,102,0.55), transparent 24%),
+      radial-gradient(circle at 96% 10%, rgba(138,92,246,0.35), transparent 26%),
+      radial-gradient(circle at 4% 92%, rgba(51,178,126,0.30), transparent 24%),
+      radial-gradient(circle at 98% 88%, rgba(58,168,216,0.35), transparent 26%),
+      linear-gradient(135deg, #FFF7E4 0%, #EAF7EF 30%, #E8F4FA 65%, #F1ECFC 100%);
+  }
+
+  .app{
+    max-width: 460px;
+    margin: 0 auto;
+    min-height: 100vh;
+    background: transparent;
+    position: relative;
+    padding-bottom: 150px;
+  }
+
+  #errorBanner{
+    display:none;
+    background:#FCE9E7; color:#B8281B; font-size:12.5px; font-weight:700;
+    padding:10px 14px; text-align:center;
+  }
+
+  /* ---------- HEADER ---------- */
+  header{
+    background: rgba(255,255,255,0.62);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    padding: 18px 16px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.5);
+    position: sticky;
+    top: 0;
+    z-index: 30;
+  }
+  .eyebrow{
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .08em;
+    color: var(--purple-dark);
+    margin-bottom: 3px;
+    text-align: center;
+  }
+  .header-row{
+    display:flex;
+    align-items:flex-start;
+    justify-content: center;
+    position: relative;
+  }
+  h1{
+    font-family: var(--font-display);
+    font-size: 30px;
+    font-weight: 800;
+    margin: 0;
+    letter-spacing: 0.01em;
+    color: var(--purple);
+    text-align: center;
+    text-shadow:
+      -2px -2px 0 #fff, 2px -2px 0 #fff, -2px 2px 0 #fff, 2px 2px 0 #fff,
+      0 4px 0 rgba(138,92,246,0.18);
+  }
+  .subtitle-line{
+    text-align:center;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--ink-soft);
+    margin: 2px 0 12px;
+  }
+  .header-icons{ display:flex; gap: 8px; align-items:center; position:absolute; right:0; top:0; }
+  .icon-btn{
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    background: var(--paper);
+    display:flex; align-items:center; justify-content:center;
+    color: var(--ink-soft);
+    cursor: pointer;
+  }
+  .avatar-btn{
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: var(--purple);
+    color: white;
+    display:flex; align-items:center; justify-content:center;
+    font-size: 15px;
+  }
+
+  .kid-pills{ display:flex; gap: 8px; margin-top: 14px; overflow-x:auto; justify-content:center; }
+  .pill{
+    flex: none; display:flex; align-items:center; gap: 6px;
+    padding: 8px 15px; border-radius: 999px; font-size: 13px; font-weight: 700;
+    background: rgba(255,255,255,0.75); color: var(--ink-soft); border: 1px solid rgba(255,255,255,0.9);
+    cursor:pointer; white-space: nowrap;
+    box-shadow: 0 2px 0 rgba(38,33,56,0.06);
+  }
+  .pill .dot{ width:7px; height:7px; border-radius:50%; background: var(--ink-faint); }
+  .pill.active{ background: linear-gradient(180deg, var(--purple), var(--purple-dark)); color: white; box-shadow: 0 3px 0 rgba(108,63,224,0.35); }
+  .pill.active .dot{ background: white; }
+  .pill[data-kid="ben"] .dot{ background: var(--blue); }
+  .pill[data-kid="nico"] .dot{ background: var(--green); }
+  .pill[data-kid="ben"].active{ background: linear-gradient(180deg, var(--blue), var(--blue-dark)); box-shadow: 0 3px 0 rgba(31,127,174,0.35); }
+  .pill[data-kid="ben"].active .dot{ background: white; }
+  .pill[data-kid="nico"].active{ background: linear-gradient(180deg, var(--green), var(--green-dark)); box-shadow: 0 3px 0 rgba(31,143,98,0.35); }
+  .pill[data-kid="nico"].active .dot{ background: white; }
+
+  .summary-row{
+    display:flex; align-items:center; justify-content:center; gap: 14px; margin-top: 12px;
+    padding: 10px 12px; background: rgba(255,255,255,0.55); border-radius: var(--radius-md);
+    font-size: 12px; font-weight: 700; color: var(--ink-soft); flex-wrap:wrap;
+  }
+  .summary-row .item{ display:flex; align-items:center; gap:6px; }
+  .summary-row .item .sw{ width:8px; height:8px; border-radius:50%; }
+  .summary-row .item.ben .sw{ background: var(--blue); }
+  .summary-row .item.nico .sw{ background: var(--green); }
+  .summary-row .count{ color: var(--ink); }
+
+  .type-tabs{ display:flex; gap: 5px; margin-top: 12px; background: rgba(255,255,255,0.55); border-radius: var(--radius-md); padding: 4px; }
+  .type-tab{
+    flex:1; text-align:center; padding: 8px 4px; border-radius: 10px; font-size: 12px; font-weight: 700;
+    color: var(--ink-soft); cursor:pointer; display:flex; align-items:center; justify-content:center; gap:4px; white-space:nowrap;
+  }
+  .type-tab.active{ background: var(--paper); color: var(--purple-dark); box-shadow: 0 2px 5px rgba(138,92,246,.18); }
+
+  main{ padding: 14px 16px 0; }
+
+  .date-row{ display:flex; align-items:center; justify-content: space-between; margin-top: 4px; margin-bottom: 12px; }
+  .date-range{ display:flex; align-items:center; gap:6px; font-size: 13.5px; font-weight: 800; color: var(--ink); }
+  .total-pill{ font-size: 11.5px; font-weight: 800; color: white; background: linear-gradient(180deg, var(--coral), var(--coral-dark)); padding: 6px 12px; border-radius: 999px; box-shadow: 0 2px 0 rgba(233,80,63,.35); }
+
+  .day-selector{ display:grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 18px; }
+  .day-box{ background: var(--paper); border: 1.5px solid var(--line); border-radius: var(--radius-md); padding: 9px 4px 8px; text-align:center; cursor:pointer; }
+  .day-box .dow{ font-size: 10.5px; font-weight: 800; color: var(--ink-soft); letter-spacing: .02em; }
+  .day-box .dom{ font-family: var(--font-display); font-size: 20px; font-weight: 700; margin: 2px 0 3px; color: var(--ink); }
+  .day-box .cnt{ font-size: 10px; color: var(--ink-faint); font-weight: 700; }
+  .day-box.active{ background: linear-gradient(180deg, var(--purple), var(--purple-dark)); border-color: var(--purple-dark); box-shadow: 0 3px 0 rgba(108,63,224,.35); }
+  .day-box.active .dow, .day-box.active .dom, .day-box.active .cnt{ color: white; }
+
+  .section-heading{ display:flex; align-items:center; justify-content: space-between; margin-bottom: 12px; }
+  .section-heading h2{ font-family: var(--font-display); font-size: 18px; font-weight: 700; margin: 0; color: var(--ink); }
+  .priority-tag{ display:flex; align-items:center; gap:6px; font-size: 12px; font-weight: 800; color: var(--coral-dark); }
+  .priority-tag .num{ width: 21px; height: 21px; border-radius: 50%; background: linear-gradient(180deg, var(--coral), var(--coral-dark)); color: white; display:flex; align-items:center; justify-content:center; font-size: 11px; }
+
+  .big-card{
+    background: var(--paper); border: 1px solid var(--line); border-left-width: 5px;
+    border-radius: var(--radius-lg); padding: 14px 14px 12px; margin-bottom: 12px;
+    box-shadow: 0 4px 14px rgba(120,110,160,.08); position: relative;
+  }
+  .big-card[data-kid="ben"]{ border-left-color: var(--blue); }
+  .big-card[data-kid="nico"]{ border-left-color: var(--green); }
+  .big-card.done{ opacity: .55; }
+
+  .big-card-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom: 9px; }
+  .kid-tag{ display:flex; align-items:center; gap:6px; font-size: 12.5px; font-weight: 700; }
+  .kid-tag .av{ width: 20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; }
+  .kid-tag[data-kid="ben"] .av{ background: var(--blue-tint); }
+  .kid-tag[data-kid="nico"] .av{ background: var(--green-tint); }
+  .kid-tag[data-kid="ben"]{ color: var(--blue-dark); }
+  .kid-tag[data-kid="nico"]{ color: var(--green-dark); }
+
+  .type-badge{ font-size: 10.5px; font-weight: 800; letter-spacing: .02em; padding: 3px 9px; border-radius: 999px; }
+  .type-badge.material{ background: var(--material-tint); color: var(--material); }
+  .type-badge.tarea{ background: var(--tarea-tint); color: var(--tarea); }
+  .type-badge.actividad{ background: var(--actividad-tint); color: var(--actividad); }
+
+  .big-card .subject{ font-size: 11.5px; font-weight: 700; color: var(--ink-faint); text-transform: uppercase; letter-spacing: .03em; margin-bottom: 3px; }
+  .big-card .title{ font-size: 15px; font-weight: 700; line-height: 1.32; margin-bottom: 5px; }
+  .big-card .desc{ font-size: 13.5px; color: var(--ink-soft); line-height: 1.4; margin-bottom: 10px; }
+  .big-card.done .title{ text-decoration: line-through; color: var(--ink-faint); }
+
+  .big-card-bottom{ display:flex; align-items:center; justify-content:space-between; padding-top: 9px; border-top: 1px solid var(--line); }
+  .context-line{ display:flex; align-items:center; gap:5px; font-size:11.5px; color: var(--ink-faint); font-weight:600; }
+  .status-pill{ font-size: 10.5px; font-weight:700; padding: 3px 8px; border-radius: 999px; }
+  .status-pill.pending{ background:#FFF1E8; color:#C9701F; }
+  .status-pill.done{ background: var(--green-tint); color: var(--green-dark); }
+
+  .check-row{ display:flex; align-items:center; gap: 8px; }
+  .check-label{ font-size: 11.5px; font-weight: 700; color: var(--ink-soft); }
+  .checkbox{
+    width: 20px; height: 20px; border-radius: 6px; border: 1.6px solid var(--line);
+    background: var(--paper); display:flex; align-items:center; justify-content:center; cursor:pointer; flex:none;
+  }
+  .checkbox.checked{ background: linear-gradient(180deg, var(--green), var(--green-dark)); border-color: var(--green-dark); }
+  .checkbox.checked::after{ content:''; width: 5px; height: 9px; border-right: 2px solid white; border-bottom: 2px solid white; transform: rotate(40deg) translate(-1px,-1px); }
+
+  .delete-x{
+    position:absolute; top:10px; right:10px; width:22px; height:22px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center; color: var(--ink-faint); cursor:pointer; font-size: 13px;
+  }
+
+  .upcoming-heading{ display:flex; align-items:center; justify-content:space-between; margin: 20px 0 12px; }
+  .upcoming-heading h3{ font-size: 14.5px; font-weight: 800; margin:0; }
+  .link{ font-size: 12.5px; font-weight: 700; color: var(--purple-dark); cursor:pointer; }
+
+  .accordion{ background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-md); margin-bottom: 10px; overflow: hidden; }
+  .accordion-head{ display:flex; align-items:center; gap: 11px; padding: 12px 13px; cursor:pointer; }
+  .date-chip{ width: 34px; height: 34px; border-radius: 10px; display:flex; align-items:center; justify-content:center; font-size: 14px; font-weight: 800; flex: none; }
+  .accordion-head .titles{ flex:1; }
+  .accordion-head .titles .d1{ font-size: 13.5px; font-weight: 700; }
+  .accordion-head .titles .d2{ font-size: 11.5px; color: var(--ink-faint); font-weight:600; }
+  .chevron{ transition: transform .15s ease; color: var(--ink-faint); }
+  .accordion.collapsed .chevron{ transform: rotate(-90deg); }
+  .accordion.collapsed .accordion-body{ display:none; }
+
+  .accordion-body{ border-top: 1px solid var(--line); }
+  .mini-row{ display:flex; align-items:center; gap: 10px; padding: 10px 13px; border-bottom: 1px solid var(--line); }
+  .mini-row:last-child{ border-bottom: none; }
+  .mini-bar{ width: 3px; align-self:stretch; border-radius:3px; flex:none; }
+  .mini-bar.ben{ background: var(--blue); }
+  .mini-bar.nico{ background: var(--green); }
+  .mini-body{ flex:1; min-width:0; }
+  .mini-meta{ display:flex; align-items:center; gap:6px; margin-bottom: 3px; }
+  .mini-kid{ font-size: 11px; font-weight: 800; }
+  .mini-kid.ben{ color: var(--blue-dark); }
+  .mini-kid.nico{ color: var(--green-dark); }
+  .mini-type{ font-size: 9.5px; font-weight: 800; padding: 1.5px 7px; border-radius: 999px; }
+  .mini-type.material{ background: var(--material-tint); color: var(--material); }
+  .mini-type.tarea{ background: var(--tarea-tint); color: var(--tarea); }
+  .mini-type.actividad{ background: var(--actividad-tint); color: var(--actividad); }
+  .mini-title{ font-size: 13px; font-weight: 600; line-height: 1.3; }
+  .mini-row.done .mini-title{ text-decoration: line-through; color: var(--ink-faint); }
+  .mini-row.done{ opacity:.55; }
+
+  .empty-state{ text-align:center; color: var(--ink-faint); font-size: 13px; padding: 30px 10px; }
+
+  .fab{
+    position: fixed; left: 50%; bottom: 82px; transform: translateX(-50%);
+    width: calc(100% - 32px); max-width: 428px; background: linear-gradient(180deg, var(--coral), var(--coral-dark)); color: white;
+    border: none; border-radius: 16px; padding: 14px; font-size: 14.5px; font-weight: 800;
+    font-family: var(--font-body);
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    box-shadow: 0 6px 0 rgba(191,63,49,.28), 0 10px 20px rgba(233,80,63,.28); z-index: 25; cursor:pointer;
+  }
+
+  .bottom-nav{
+    position: fixed; left: 50%; bottom: 0; transform: translateX(-50%); width: 100%; max-width: 460px;
+    background: rgba(255,255,255,0.85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    border-top: 1px solid var(--line); display:flex;
+    padding: 8px 6px calc(8px + env(safe-area-inset-bottom)); z-index: 25;
+  }
+  .nav-item{ flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; color: var(--ink-faint); font-size: 10.5px; font-weight: 700; padding: 4px 0; cursor:pointer; }
+  .nav-item.active{ color: var(--purple); }
+
+  /* ---------- UPLOAD / MANAGE VIEW ---------- */
+  .upload-view{
+    display:none;
+    position: fixed; inset:0; background: var(--bg); z-index: 60;
+    max-width: 460px; margin: 0 auto; overflow-y:auto; padding-bottom: 40px;
+  }
+  .upload-view.open{ display:block; }
+  .upload-header{
+    background: var(--paper); border-bottom: 1px solid var(--line);
+    padding: 16px; display:flex; align-items:center; justify-content:space-between; position: sticky; top:0;
+  }
+  .upload-header h2{ font-size: 17px; font-weight: 800; margin:0; }
+  .close-btn{ width:32px; height:32px; border-radius:50%; background:#EEF0F4; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+
+  .upload-body{ padding: 16px; }
+  .card-block{
+    background: var(--paper); border:1px solid var(--line); border-radius: var(--radius-lg);
+    padding: 16px; margin-bottom: 16px;
+  }
+  .card-block h3{ font-size: 14px; font-weight: 800; margin: 0 0 4px; }
+  .card-block p.hint{ font-size: 12.5px; color: var(--ink-soft); margin: 0 0 12px; line-height:1.4; }
+
+  input[type="file"]{
+    width:100%; font-size: 12.5px; padding: 10px; border: 1.5px dashed var(--line); border-radius: 10px; background:#FAFBFC;
+  }
+  .pdf-text{
+    margin-top: 10px; max-height: 160px; overflow-y:auto; background:#FAFBFC; border:1px solid var(--line);
+    border-radius: 10px; padding: 10px; font-size: 11.5px; color: var(--ink-soft); white-space: pre-wrap; line-height:1.5;
+  }
+
+  .form-grid{ display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  .form-field{ display:flex; flex-direction:column; gap:5px; }
+  .form-field.full{ grid-column: 1 / -1; }
+  .form-field label{ font-size: 11.5px; font-weight: 700; color: var(--ink-soft); }
+  .form-field select, .form-field input[type="text"], .form-field textarea{
+    border: 1.5px solid var(--line); border-radius: 9px; padding: 9px 10px; font-size: 13.5px;
+    font-family: inherit; background: var(--paper); color: var(--ink);
+  }
+  .form-field textarea{ resize: vertical; min-height: 52px; }
+
+  .btn{
+    display:flex; align-items:center; justify-content:center; gap:6px;
+    border:none; border-radius: 11px; padding: 12px; font-size: 13.5px; font-weight: 700; cursor:pointer; width:100%;
+  }
+  .btn-primary{ background: linear-gradient(180deg, var(--coral), var(--coral-dark)); color:white; box-shadow: 0 3px 0 rgba(191,63,49,.3); }
+  .btn-secondary{ background:#EEF0F4; color: var(--ink); }
+  .btn-danger{ background: var(--material-tint); color: var(--material); }
+
+  .manage-day{ margin-bottom: 14px; }
+  .manage-day-title{ font-size: 12.5px; font-weight: 800; color: var(--ink-soft); margin: 0 0 8px; }
+  .manage-row{
+    display:flex; align-items:center; gap:10px; padding: 9px 10px; background: var(--paper);
+    border:1px solid var(--line); border-radius: 10px; margin-bottom: 7px;
+  }
+  .manage-row .mini-bar{ width:3px; }
+  .manage-row .manage-body{ flex:1; min-width:0; font-size: 12.5px; }
+  .manage-row .manage-body .t1{ font-weight:700; }
+  .manage-row .manage-body .t2{ color: var(--ink-faint); font-size:11px; }
+  .manage-row .del{ color: var(--material); font-size: 16px; cursor:pointer; flex:none; padding: 4px; }
+
+  @media (min-width: 480px){
+    body{ background: #E4E7EC; }
+    .app{ box-shadow: 0 0 0 1px var(--line), 0 20px 60px rgba(20,25,40,.12); margin-top: 18px; margin-bottom: 18px; border-radius: 28px; overflow:hidden; }
+    header{ border-top-left-radius:28px; border-top-right-radius:28px; }
+    .upload-view{ margin-top: 18px; margin-bottom: 18px; border-radius: 28px; height: calc(100vh - 36px); }
+  }
+</style>
+</head>
+<body>
+<div class="bg-scene"></div>
+<div id="errorBanner"></div>
+<div class="app">
+
+  <header>
+    <div class="eyebrow">SEMANA ACTUAL</div>
+    <div class="header-row">
+      <h1>Semana</h1>
+      <div class="header-icons">
+        <div class="icon-btn" id="openUploadTop" title="Actualizar semana">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M12 18v-6M9.5 15.5L12 18l2.5-2.5"/></svg>
+        </div>
+        <div class="avatar-btn">👤</div>
+      </div>
+    </div>
+    <div class="subtitle-line">Tareas · Materiales · Actividades de la semana</div>
+
+    <div class="kid-pills" id="kidPills">
+      <div class="pill active" data-kid="all"><span class="dot"></span>Todos</div>
+      <div class="pill" data-kid="ben"><span class="dot"></span>Ben • Nursery</div>
+      <div class="pill" data-kid="nico"><span class="dot"></span>Nico • 3ro A</div>
+    </div>
+
+    <div class="summary-row" id="summaryRow"></div>
+
+    <div class="type-tabs" id="typeTabs">
+      <div class="type-tab active" data-type="all">Todo</div>
+      <div class="type-tab" data-type="material">📦 Materiales</div>
+      <div class="type-tab" data-type="tarea">✏️ Tareas</div>
+      <div class="type-tab" data-type="actividad">⭐ Actividades</div>
+    </div>
+  </header>
+
+  <main>
+    <div class="date-row">
+      <div class="date-range">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        <span id="weekLabelText"></span>
+      </div>
+      <div class="total-pill" id="totalPill">0 pendientes totales</div>
+    </div>
+
+    <div class="day-selector" id="daySelector"></div>
+
+    <div class="section-heading">
+      <h2 id="selectedDayTitle"></h2>
+      <div class="priority-tag"><span class="num" id="priorityCount">0</span>pendientes</div>
+    </div>
+
+    <div id="bigCards"></div>
+
+    <div class="upcoming-heading">
+      <h3>Próximos días de la semana</h3>
+      <div class="link" id="toggleAll">Vista extendida</div>
+    </div>
+
+    <div id="accordionList"></div>
+  </main>
+
+  <button class="fab" id="fabBtn">
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+    Agregar pendiente o escanear
+  </button>
+
+  <nav class="bottom-nav">
+    <div class="nav-item active" data-nav="semana">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+      Semana
+    </div>
+    <div class="nav-item" data-nav="mochilas">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8V6a6 6 0 1112 0v2M4 8h16l-1 12a2 2 0 01-2 2H7a2 2 0 01-2-2L4 8z"/></svg>
+      Mochilas
+    </div>
+    <div class="nav-item" data-nav="pdfs">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M12 18v-6M9.5 15.5L12 18l2.5-2.5"/></svg>
+      Subir PDFs
+    </div>
+    <div class="nav-item" data-nav="ajustes">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09A1.65 1.65 0 0015 4.6a1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      Ajustes
+    </div>
+  </nav>
+
+</div>
+
+<!-- ============ UPLOAD / MANAGE VIEW ============ -->
+<div class="upload-view" id="uploadView">
+  <div class="upload-header">
+    <h2>Actualizar la semana</h2>
+    <div class="close-btn" id="closeUpload">✕</div>
+  </div>
+  <div class="upload-body">
+
+    <div class="card-block">
+      <h3>Fechas de esta semana</h3>
+      <p class="hint">Se muestran en la parte de arriba de la app.</p>
+      <div class="form-grid">
+        <div class="form-field full">
+          <label>Texto del rango (ej. "7 – 10 de septiembre")</label>
+          <input type="text" id="inputWeekLabel">
+        </div>
+        <div class="form-field">
+          <label>Fecha Lunes</label>
+          <input type="text" id="inputDomLunes" placeholder="7">
+        </div>
+        <div class="form-field">
+          <label>Fecha Martes</label>
+          <input type="text" id="inputDomMartes" placeholder="8">
+        </div>
+        <div class="form-field">
+          <label>Fecha Miércoles</label>
+          <input type="text" id="inputDomMiercoles" placeholder="9">
+        </div>
+        <div class="form-field">
+          <label>Fecha Jueves</label>
+          <input type="text" id="inputDomJueves" placeholder="10">
+        </div>
+        <div class="form-field full">
+          <label>Mes (ej. "de Septiembre")</label>
+          <input type="text" id="inputMonthText" placeholder="de Septiembre">
+        </div>
+      </div>
+      <button class="btn btn-secondary" id="saveDatesBtn">Guardar fechas</button>
+    </div>
+
+    <div class="card-block">
+      <h3>1. Cargar el PDF del colegio</h3>
+      <p class="hint">Selecciona el cronograma en PDF para ver su texto y copiar los datos de cada pendiente en el formulario de abajo. La extracción es solo para consulta — no se procesa automáticamente porque cada colegio usa un formato distinto.</p>
+      <input type="file" id="pdfInput" accept="application/pdf">
+      <div class="pdf-text" id="pdfText" style="display:none;"></div>
+    </div>
+
+    <div class="card-block">
+      <h3>2. Agregar un pendiente</h3>
+      <p class="hint">Llena estos campos por cada tarea, material o actividad que veas en el PDF.</p>
+      <div class="form-grid">
+        <div class="form-field">
+          <label>Día</label>
+          <select id="fDay">
+            <option value="lunes">Lunes</option>
+            <option value="martes">Martes</option>
+            <option value="miercoles">Miércoles</option>
+            <option value="jueves">Jueves</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Hijo</label>
+          <select id="fKid">
+            <option value="ben">Ben (Nursery)</option>
+            <option value="nico">Nico (3ro A)</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Tipo</label>
+          <select id="fTipo">
+            <option value="tarea">Tarea</option>
+            <option value="material">Material</option>
+            <option value="actividad">Actividad</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Puntos (opcional)</label>
+          <input type="text" id="fPoints" placeholder="ej. 5 pts">
+        </div>
+        <div class="form-field full">
+          <label>Materia / área</label>
+          <input type="text" id="fSubject" placeholder="ej. Matemática">
+        </div>
+        <div class="form-field full">
+          <label>Título corto</label>
+          <input type="text" id="fTitle" placeholder="ej. Resolver páginas 531 y 532">
+        </div>
+        <div class="form-field full">
+          <label>Detalle</label>
+          <textarea id="fDesc" placeholder="Descripción completa de la tarea, material o actividad"></textarea>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="addItemBtn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+        Agregar a la semana
+      </button>
+    </div>
+
+    <div class="card-block">
+      <h3>Pendientes actuales</h3>
+      <p class="hint">Toca la ✕ para eliminar algo que ya no aplique.</p>
+      <div id="manageList"></div>
+    </div>
+
+    <button class="btn btn-danger" id="resetBtn">Vaciar toda la semana y empezar de nuevo</button>
+  </div>
+</div>
+
+<script>
+window.addEventListener('error', function(e){
+  const b = document.getElementById('errorBanner');
+  if(b){ b.style.display='block'; b.textContent = 'Ocurrió un problema cargando la app: ' + e.message; }
+});
+
+/* ---------------- STORAGE (works inside Claude, falls back to the phone's browser storage) ---------------- */
+function hasClaudeStorage(){
+  return typeof window.storage !== 'undefined' && typeof window.storage.get === 'function';
+}
+async function storageGet(key){
+  if(hasClaudeStorage()){
+    try{ const r = await window.storage.get(key, false); return r ? r.value : null; }catch(e){}
+  }
+  try{ return localStorage.getItem(key); }catch(e){ return null; }
+}
+async function storageSet(key, value){
+  if(hasClaudeStorage()){
+    try{ await window.storage.set(key, value, false); return; }catch(e){}
+  }
+  try{ localStorage.setItem(key, value); }catch(e){}
+}
+
+const DATA_KEY = 'pendientes-data-v3';
+const CHECKS_KEY = 'pendientes-checks-v3';
+
+const DOW_LABELS = { lunes:'LUN', martes:'MAR', miercoles:'MIÉ', jueves:'JUE' };
+const DOW_FULL = { lunes:'Lunes', martes:'Martes', miercoles:'Miércoles', jueves:'Jueves' };
+const CHIP_STYLES = {
+  lunes:     { chip:'#EEF0F4', chipText:'#4B5160' },
+  martes:    { chip:'#E8F0FE', chipText:'#2F6FED' },
+  miercoles: { chip:'#FFF1E8', chipText:'#C9701F' },
+  jueves:    { chip:'#F1E7FB', chipText:'#8A3FD1' },
+};
+
+const TYPE_INFO = {
+  material:  { label:'Material',  cls:'material',  checkLabel:'Listo en mochila', context:'Antes de la clase' },
+  tarea:     { label:'Tarea',     cls:'tarea',      checkLabel:'Completado',        context:'Revisar esta noche' },
+  actividad: { label:'Actividad', cls:'actividad',  checkLabel:'Confirmado',        context:'Preparar con anticipación' },
+};
+
+const DEFAULT_DATA = {
+  weekLabel: '7 – 10 de septiembre',
+  monthText: 'de Septiembre',
+  dom: { lunes:7, martes:8, miercoles:9, jueves:10 },
+  items: {
+    lunes: [
+      { kid:'nico', tipo:'tarea', subject:'Comunicación y Lenguaje', title:'Proyecto "Cantando y escribiendo a Guatemala"', desc:'Fase II: resolver dudas y consultar el documento disponible en la plataforma.' },
+      { kid:'nico', tipo:'tarea', subject:'Spelling', title:'Practicar Vocabulary 4', desc:'Estudiar para el dictado del jueves 10.', points:'3 pts' },
+      { kid:'ben', tipo:'tarea', subject:'Language Arts', title:'Practicar vocabulario de la semana', desc:'Prepararse para el examen del viernes.' },
+      { kid:'ben', tipo:'tarea', subject:'Language Arts', title:'Completar Project U-4', desc:'Terminar el proyecto en casa para entregarlo en la fecha indicada.' },
+      { kid:'ben', tipo:'tarea', subject:'Comunicación y Lenguaje', title:'Repaso de vocales y rimas', desc:'Practicar el sonido de las vocales.' },
+      { kid:'ben', tipo:'tarea', subject:'Orientación Cristiana', title:'Orar en familia', desc:'Recordar orar con los papás en todo momento.' },
+    ],
+    martes: [
+      { kid:'nico', tipo:'tarea', subject:'Language Arts', title:'Estudiar Vocabulary 4', desc:'Dictado el jueves 10.' },
+      { kid:'nico', tipo:'tarea', subject:'Matemática', title:'Escribir expresiones', desc:'Resolver páginas 531 y 532.' },
+      { kid:'nico', tipo:'tarea', subject:'Comunicación y Lenguaje', title:'Presentación de poema o canción', desc:'Claves 1 a 10. Presentarse con traje típico e instrumento si se requiere.' },
+      { kid:'nico', tipo:'material', subject:'Natación', title:'Equipo de natación', desc:'Gorra, lentes, calzoneta del uniforme, toalla o bata y ginas.' },
+      { kid:'nico', tipo:'material', subject:'Language Arts', title:'Imprimir Voc. 4 - Unit 4.pdf', desc:'Descargar y llevar el recurso impreso.' },
+      { kid:'nico', tipo:'material', subject:'Geografía', title:'4 imágenes de accidentes geográficos', desc:'Bahía, península, golfo y cabo. Aprox. 10 × 15 cm cada una.' },
+      { kid:'ben', tipo:'tarea', subject:'Conocimiento de su mundo', title:'Buscar símbolos patrios', desc:'Con ayuda de un adulto, buscar imágenes para repasar en casa.' },
+      { kid:'ben', tipo:'tarea', subject:'Destrezas de Aprendizaje', title:'Repasar trazo del 1 al 8', desc:'Practicar también conteo con juguetes o en familia.' },
+      { kid:'ben', tipo:'material', subject:'Natación', title:'Implementos de natación', desc:'Todo identificado con nombre.' },
+      { kid:'ben', tipo:'material', subject:'Language Arts', title:'Materiales para actividad', desc:'Botella plástica cortada por la mitad (con boquilla), papel manila y 3 ligas para el cabello.' },
+    ],
+    miercoles: [
+      { kid:'nico', tipo:'tarea', subject:'Caligrafía', title:'Páginas 96 y 97', desc:'Realizar las páginas del libro de caligrafía.' },
+      { kid:'nico', tipo:'actividad', subject:'Devocional', title:'Taller "Los valores"', desc:'Actividad devocional en el colegio.', points:'15 pts' },
+      { kid:'ben', tipo:'material', subject:'Comunicación y Lenguaje', title:'Hoja de rimas impresa', desc:'Descargar del área de recursos y llevarla impresa.' },
+      { kid:'ben', tipo:'material', subject:'Conocimiento de su mundo', title:'Comida típica favorita', desc:'Chuchito, tostada, rellenito, mole, doblada, etc.' },
+      { kid:'ben', tipo:'actividad', subject:'Devocional', title:'Actividad devocional del día', desc:'Participación en clase.' },
+    ],
+    jueves: [
+      { kid:'nico', tipo:'tarea', subject:'Writing and Reading', title:'"Germs - chapter 1" en Richmond Studio', desc:'Leer la historia y completar los ejercicios en la plataforma.', points:'5 pts' },
+      { kid:'nico', tipo:'tarea', subject:'Comunicación y Lenguaje', title:'Presentación de poema o canción', desc:'Claves 11 a 20.' },
+      { kid:'nico', tipo:'tarea', subject:'Spelling', title:'Dictado #3', desc:'Preparar vocabulario para el dictado.', points:'3 pts' },
+      { kid:'nico', tipo:'tarea', subject:'Matemática', title:'Evaluar expresiones', desc:'Resolver páginas 537 y 538.' },
+      { kid:'nico', tipo:'tarea', subject:'Language Arts', title:'Dictado #4', desc:'Dictado de vocabulario del día.', points:'4 pts' },
+      { kid:'nico', tipo:'material', subject:'Educación Física', title:'Uniforme completo de deporte', desc:'Presentarse con uniforme y tenis.' },
+      { kid:'nico', tipo:'actividad', subject:'Escuela para padres', title:'Sesión presencial', desc:'Zona 5, 18:00 hrs. Asistencia importante.', points:'15 pts devocional + 10 pts Orientación' },
+      { kid:'ben', tipo:'material', subject:'Comunicación y Lenguaje', title:'Hoja de patrones impresa', desc:'Descargar del área de recursos y llevarla impresa.' },
+      { kid:'ben', tipo:'material', subject:'Language Arts', title:'Bolsita de fideos espirales', desc:'Llevar una pequeña bolsa para actividad en clase.' },
+      { kid:'ben', tipo:'material', subject:'Conocimiento de su mundo', title:'Dulces típicos + 6 plumas verdes', desc:'Dulces para compartir con compañeros por fiestas patrias.' },
+      { kid:'ben', tipo:'actividad', subject:'Escuela para padres', title:'Iglesia Ministerios Ebenezer', desc:'18:00 hrs. Asistencia importante.', points:'15 pts devocional + 10 pts Orientación' },
+    ],
+  }
+};
+
+let DATA = JSON.parse(JSON.stringify(DEFAULT_DATA));
+let checkedState = {};
+let currentDay = 'lunes';
+let currentKid = 'all';
+let currentType = 'all';
+let collapsedAccordions = {};
+
+function getDays(){
+  return ['lunes','martes','miercoles','jueves'].map(key => ({
+    key,
+    dow: DOW_LABELS[key],
+    dom: DATA.dom[key],
+    full: DOW_FULL[key] + ' ' + DATA.dom[key] + ' ' + DATA.monthText,
+    chip: CHIP_STYLES[key].chip,
+    chipText: CHIP_STYLES[key].chipText,
+  }));
+}
+
+function itemId(dayKey, idx){ return dayKey + '-' + idx; }
+function matchesFilter(it){
+  if(currentKid !== 'all' && it.kid !== currentKid) return false;
+  if(currentType !== 'all' && it.tipo !== currentType) return false;
+  return true;
+}
+function dayCounts(dayKey){ return DATA.items[dayKey].filter(matchesFilter).length; }
+function dayPendingCounts(dayKey){
+  return DATA.items[dayKey].map((it,i)=>({it,i})).filter(({it})=>matchesFilter(it))
+    .filter(({i}) => !checkedState[itemId(dayKey,i)]).length;
+}
+function kidLabel(kid){ return kid === 'ben' ? 'Ben' : 'Nico'; }
+function kidAvatar(kid){ return kid === 'ben' ? '👶' : '🧒'; }
+
+function renderKidPills(){
+  document.querySelectorAll('.pill').forEach(p=> p.classList.toggle('active', p.dataset.kid === currentKid));
+}
+function renderSummary(){
+  const el = document.getElementById('summaryRow');
+  const days = ['lunes','martes','miercoles','jueves'];
+  const allCount = days.reduce((s,d)=> s + DATA.items[d].filter(it => currentType==='all' || it.tipo===currentType).length, 0);
+  const benCount = days.reduce((s,d)=> s + DATA.items[d].filter(it => it.kid==='ben' && (currentType==='all' || it.tipo===currentType)).length, 0);
+  const nicoCount = days.reduce((s,d)=> s + DATA.items[d].filter(it => it.kid==='nico' && (currentType==='all' || it.tipo===currentType)).length, 0);
+  el.innerHTML = `
+    <div class="item"><span>Todos <span class="count">(${allCount})</span></span></div>
+    <div class="item ben"><span class="sw"></span>Ben • Nursery <span class="count">${benCount}</span></div>
+    <div class="item nico"><span class="sw"></span>Nico • 3ro A <span class="count">${nicoCount}</span></div>
+  `;
+}
+function renderTypeTabs(){
+  document.querySelectorAll('.type-tab').forEach(t=> t.classList.toggle('active', t.dataset.type === currentType));
+}
+function renderDaySelector(){
+  const wrap = document.getElementById('daySelector');
+  wrap.innerHTML = '';
+  getDays().forEach(d=>{
+    const box = document.createElement('div');
+    box.className = 'day-box' + (d.key===currentDay ? ' active' : '');
+    const c = dayCounts(d.key);
+    box.innerHTML = `<div class="dow">${d.dow}</div><div class="dom">${d.dom}</div><div class="cnt">${c} item${c===1?'':'s'}</div>`;
+    box.onclick = () => { currentDay = d.key; render(); };
+    wrap.appendChild(box);
+  });
+}
+function renderTotalPill(){
+  const total = ['lunes','martes','miercoles','jueves'].reduce((s,d)=> s + dayPendingCounts(d), 0);
+  document.getElementById('totalPill').textContent = total + ' pendiente' + (total===1?'':'s') + ' totales';
+  document.getElementById('weekLabelText').textContent = DATA.weekLabel;
+}
+
+function renderBigCards(){
+  const dayInfo = getDays().find(d=>d.key===currentDay);
+  document.getElementById('selectedDayTitle').textContent = dayInfo.full;
+
+  const items = DATA.items[currentDay].map((it,i)=>({...it, idx:i})).filter(matchesFilter);
+  const pending = items.filter(it => !checkedState[itemId(currentDay, it.idx)]).length;
+  document.getElementById('priorityCount').textContent = pending;
+
+  const wrap = document.getElementById('bigCards');
+  wrap.innerHTML = '';
+  if(items.length === 0){
+    wrap.innerHTML = '<div class="empty-state">No hay pendientes para este día con el filtro actual.</div>';
+    return;
+  }
+  items.forEach(it=>{
+    const id = itemId(currentDay, it.idx);
+    const done = !!checkedState[id];
+    const info = TYPE_INFO[it.tipo];
+    const card = document.createElement('div');
+    card.className = 'big-card' + (done ? ' done' : '');
+    card.dataset.kid = it.kid;
+    card.innerHTML = `
+      <div class="delete-x" data-day="${currentDay}" data-idx="${it.idx}">✕</div>
+      <div class="big-card-top">
+        <div class="kid-tag" data-kid="${it.kid}"><span class="av">${kidAvatar(it.kid)}</span>${kidLabel(it.kid)} • ${it.kid==='ben' ? 'Nursery' : '3ro A'}</div>
+        <div class="type-badge ${info.cls}">${info.label.toUpperCase()}</div>
+      </div>
+      <div class="subject">${it.subject}</div>
+      <div class="title">${it.title}</div>
+      <div class="desc">${it.desc}${it.points ? ' <strong>· '+it.points+'</strong>' : ''}</div>
+      <div class="big-card-bottom">
+        <div class="context-line">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          ${info.context}
+          <span class="status-pill ${done ? 'done' : 'pending'}">${done ? 'Listo' : 'Pendiente'}</span>
+        </div>
+        <div class="check-row">
+          <span class="check-label">${info.checkLabel}</span>
+          <div class="checkbox ${done ? 'checked' : ''}" data-id="${id}"></div>
+        </div>
+      </div>
+    `;
+    card.querySelector('.checkbox').onclick = () => { checkedState[id] = !checkedState[id]; saveChecks(); render(); };
+    card.querySelector('.delete-x').onclick = () => { deleteItem(currentDay, it.idx); };
+    wrap.appendChild(card);
+  });
+}
+
+function renderAccordions(){
+  const wrap = document.getElementById('accordionList');
+  wrap.innerHTML = '';
+  const otherDays = getDays().filter(d => d.key !== currentDay);
+  let any = false;
+  otherDays.forEach(d=>{
+    const items = DATA.items[d.key].map((it,i)=>({...it, idx:i})).filter(matchesFilter);
+    if(items.length === 0) return;
+    any = true;
+    const pending = items.filter(it => !checkedState[itemId(d.key, it.idx)]).length;
+    const collapsed = !!collapsedAccordions[d.key];
+    const acc = document.createElement('div');
+    acc.className = 'accordion' + (collapsed ? ' collapsed' : '');
+    const head = document.createElement('div');
+    head.className = 'accordion-head';
+    head.innerHTML = `
+      <div class="date-chip" style="background:${d.chip}; color:${d.chipText}">${d.dom}</div>
+      <div class="titles"><div class="d1">${DOW_FULL[d.key]}</div><div class="d2">${pending} pendiente${pending===1?'':'s'}</div></div>
+      <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+    `;
+    head.onclick = () => { collapsedAccordions[d.key] = !collapsedAccordions[d.key]; render(); };
+    acc.appendChild(head);
+    const body = document.createElement('div');
+    body.className = 'accordion-body';
+    items.forEach(it=>{
+      const id = itemId(d.key, it.idx);
+      const done = !!checkedState[id];
+      const info = TYPE_INFO[it.tipo];
+      const row = document.createElement('div');
+      row.className = 'mini-row' + (done ? ' done' : '');
+      row.innerHTML = `
+        <div class="mini-bar ${it.kid}"></div>
+        <div class="mini-body">
+          <div class="mini-meta"><span class="mini-kid ${it.kid}">${kidLabel(it.kid)}</span><span class="mini-type ${info.cls}">${info.label}</span></div>
+          <div class="mini-title">${it.title}</div>
+        </div>
+        <div class="checkbox ${done ? 'checked' : ''}" data-id="${id}"></div>
+      `;
+      row.querySelector('.checkbox').onclick = () => { checkedState[id] = !checkedState[id]; saveChecks(); render(); };
+      body.appendChild(row);
+    });
+    acc.appendChild(body);
+    wrap.appendChild(acc);
+  });
+  if(!any) wrap.innerHTML = '<div class="empty-state">No hay más pendientes esta semana con este filtro.</div>';
+}
+
+function render(){
+  try{
+    renderKidPills();
+    renderSummary();
+    renderTypeTabs();
+    renderDaySelector();
+    renderTotalPill();
+    renderBigCards();
+    renderAccordions();
+  }catch(e){
+    const b = document.getElementById('errorBanner');
+    b.style.display='block'; b.textContent = 'Error al dibujar la app: ' + e.message;
+  }
+}
+
+async function saveChecks(){ await storageSet(CHECKS_KEY, JSON.stringify(checkedState)); }
+async function saveData(){ await storageSet(DATA_KEY, JSON.stringify(DATA)); }
+
+function deleteItem(dayKey, idx){
+  DATA.items[dayKey].splice(idx, 1);
+  // shift checked states for that day since indices changed
+  const newChecked = {};
+  Object.keys(checkedState).forEach(k=>{
+    if(!k.startsWith(dayKey + '-')){ newChecked[k] = checkedState[k]; return; }
+    const oldIdx = parseInt(k.split('-')[1], 10);
+    if(oldIdx < idx) newChecked[k] = checkedState[k];
+    else if(oldIdx > idx) newChecked[dayKey + '-' + (oldIdx - 1)] = checkedState[k];
+  });
+  checkedState = newChecked;
+  saveData(); saveChecks(); render(); renderManageList();
+}
+
+/* ---------------- filters / nav ---------------- */
+document.querySelectorAll('.pill').forEach(p=> p.onclick = () => { currentKid = p.dataset.kid; render(); });
+document.querySelectorAll('.type-tab').forEach(t=> t.onclick = () => { currentType = t.dataset.type; render(); });
+document.getElementById('toggleAll').onclick = () => {
+  const anyCollapsed = ['lunes','martes','miercoles','jueves'].some(d => collapsedAccordions[d]);
+  ['lunes','martes','miercoles','jueves'].forEach(d => { collapsedAccordions[d] = !anyCollapsed; });
+  render();
+};
+document.querySelectorAll('.nav-item').forEach(n=>{
+  n.onclick = () => {
+    if(n.dataset.nav === 'semana') return;
+    if(n.dataset.nav === 'pdfs'){ openUpload(); return; }
+    alert('Esta sección todavía no está disponible en la vista previa.');
+  };
+});
+document.getElementById('fabBtn').onclick = openUpload;
+document.getElementById('openUploadTop').onclick = openUpload;
+document.getElementById('closeUpload').onclick = closeUpload;
+
+function openUpload(){
+  // Open the panel first, no matter what — a problem filling the form
+  // below should never prevent the sheet from showing.
+  document.getElementById('uploadView').classList.add('open');
+  try{
+    document.getElementById('inputWeekLabel').value = DATA.weekLabel || '';
+    document.getElementById('inputMonthText').value = DATA.monthText || '';
+    document.getElementById('inputDomLunes').value = (DATA.dom && DATA.dom.lunes) || '';
+    document.getElementById('inputDomMartes').value = (DATA.dom && DATA.dom.martes) || '';
+    document.getElementById('inputDomMiercoles').value = (DATA.dom && DATA.dom.miercoles) || '';
+    document.getElementById('inputDomJueves').value = (DATA.dom && DATA.dom.jueves) || '';
+  }catch(e){}
+  try{ renderManageList(); }catch(e){}
+}
+function closeUpload(){
+  document.getElementById('uploadView').classList.remove('open');
+  try{ render(); }catch(e){}
+}
+
+document.getElementById('saveDatesBtn').onclick = () => {
+  DATA.weekLabel = document.getElementById('inputWeekLabel').value || DATA.weekLabel;
+  DATA.monthText = document.getElementById('inputMonthText').value || DATA.monthText;
+  DATA.dom.lunes = document.getElementById('inputDomLunes').value || DATA.dom.lunes;
+  DATA.dom.martes = document.getElementById('inputDomMartes').value || DATA.dom.martes;
+  DATA.dom.miercoles = document.getElementById('inputDomMiercoles').value || DATA.dom.miercoles;
+  DATA.dom.jueves = document.getElementById('inputDomJueves').value || DATA.dom.jueves;
+  saveData();
+  alert('Fechas actualizadas.');
+};
+
+document.getElementById('addItemBtn').onclick = () => {
+  const day = document.getElementById('fDay').value;
+  const kid = document.getElementById('fKid').value;
+  const tipo = document.getElementById('fTipo').value;
+  const subject = document.getElementById('fSubject').value.trim();
+  const title = document.getElementById('fTitle').value.trim();
+  const desc = document.getElementById('fDesc').value.trim();
+  const points = document.getElementById('fPoints').value.trim();
+
+  if(!title){ alert('Escribe al menos un título para el pendiente.'); return; }
+
+  const newItem = { kid, tipo, subject: subject || 'General', title, desc: desc || '' };
+  if(points) newItem.points = points;
+  DATA.items[day].push(newItem);
+  saveData();
+
+  document.getElementById('fSubject').value = '';
+  document.getElementById('fTitle').value = '';
+  document.getElementById('fDesc').value = '';
+  document.getElementById('fPoints').value = '';
+
+  renderManageList();
+};
+
+function renderManageList(){
+  const wrap = document.getElementById('manageList');
+  wrap.innerHTML = '';
+  ['lunes','martes','miercoles','jueves'].forEach(dayKey=>{
+    const items = DATA.items[dayKey];
+    if(items.length === 0) return;
+    const block = document.createElement('div');
+    block.className = 'manage-day';
+    block.innerHTML = `<div class="manage-day-title">${DOW_FULL[dayKey]}</div>`;
+    items.forEach((it, idx)=>{
+      const row = document.createElement('div');
+      row.className = 'manage-row';
+      const info = TYPE_INFO[it.tipo];
+      row.innerHTML = `
+        <div class="mini-bar ${it.kid}" style="height:28px;"></div>
+        <div class="manage-body">
+          <div class="t1">${kidLabel(it.kid)} · ${info.label} · ${it.title}</div>
+          <div class="t2">${it.subject}</div>
+        </div>
+        <div class="del">✕</div>
+      `;
+      row.querySelector('.del').onclick = () => deleteItem(dayKey, idx);
+      block.appendChild(row);
+    });
+    wrap.appendChild(block);
+  });
+  if(wrap.innerHTML === '') wrap.innerHTML = '<div class="empty-state">Todavía no hay pendientes esta semana.</div>';
+}
+
+document.getElementById('resetBtn').onclick = () => {
+  if(!confirm('¿Vaciar todos los pendientes de la semana? Esta acción no se puede deshacer.')) return;
+  DATA.items = { lunes:[], martes:[], miercoles:[], jueves:[] };
+  checkedState = {};
+  saveData(); saveChecks();
+  renderManageList();
+  render();
+};
+
+/* ---------------- PDF text extraction (view-only helper, loaded on demand) ---------------- */
+let pdfJsLoadPromise = null;
+function loadPdfJs(){
+  if(typeof pdfjsLib !== 'undefined') return Promise.resolve();
+  if(pdfJsLoadPromise) return pdfJsLoadPromise;
+  pdfJsLoadPromise = new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+    s.onload = resolve;
+    s.onerror = () => reject(new Error('no se pudo descargar el lector de PDF'));
+    document.head.appendChild(s);
+  });
+  return pdfJsLoadPromise;
+}
+
+document.getElementById('pdfInput').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if(!file) return;
+  const textBox = document.getElementById('pdfText');
+  textBox.style.display = 'block';
+  textBox.textContent = 'Cargando lector de PDF...';
+  try{
+    await loadPdfJs();
+    if(typeof pdfjsLib === 'undefined'){
+      textBox.textContent = 'No se pudo cargar el lector de PDF (revisa tu conexión a internet) — puedes abrir el PDF en otra pestaña y copiar el texto manualmente al formulario.';
+      return;
+    }
+    textBox.textContent = 'Leyendo PDF...';
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    const buffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: buffer }).promise;
+    let fullText = '';
+    for(let p = 1; p <= pdf.numPages; p++){
+      const page = await pdf.getPage(p);
+      const content = await page.getTextContent();
+      const pageText = content.items.map(i => i.str).join(' ');
+      fullText += '--- Página ' + p + ' ---\n' + pageText + '\n\n';
+    }
+    textBox.textContent = fullText || 'No se encontró texto seleccionable en este PDF.';
+  }catch(err){
+    textBox.textContent = 'No se pudo leer el PDF (' + err.message + '). Puedes abrirlo aparte y copiar el texto manualmente al formulario de abajo.';
+  }
+});
+
+/* ---------------- init ---------------- */
+(async () => {
+  try{
+    const savedData = await storageGet(DATA_KEY);
+    if(savedData){ DATA = JSON.parse(savedData); }
+  }catch(e){}
+  try{
+    const savedChecks = await storageGet(CHECKS_KEY);
+    if(savedChecks){ checkedState = JSON.parse(savedChecks); }
+  }catch(e){}
+  render();
+})();
+
+// render immediately with defaults too, in case storage is slow, so the screen is never blank
+render();
+</script>
+</body>
+</html>
