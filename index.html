@@ -203,6 +203,7 @@
     background: var(--paper); border: 1px solid var(--line); border-left-width: 5px;
     border-radius: var(--radius-lg); padding: 14px 14px 12px; margin-bottom: 12px;
     box-shadow: 0 4px 14px rgba(120,110,160,.08); position: relative;
+    display:flex; flex-direction:column;
   }
   .big-card.done{ opacity: .55; }
 
@@ -250,7 +251,7 @@
   .badge{ display:flex; align-items:center; gap:4px; font-size:11px; font-weight:800; padding:4px 9px; border-radius:999px; white-space:nowrap; }
   .time-badge{ font-size:11px; font-weight:800; color: var(--ink-faint); white-space:nowrap; flex:none; margin-left:8px; text-align:right; }
 
-  .card-body-row{ display:flex; gap:11px; margin-bottom:12px; }
+  .card-body-row{ display:flex; gap:11px; margin-bottom:12px; flex:1; }
   .icon-circle{ width:44px; height:44px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:20px; flex:none; }
   .card-text{ flex:1; min-width:0; }
 
@@ -417,10 +418,10 @@
     header{ padding: 18px 28px 14px; }
     main{ padding: 14px 28px 0; }
 
-    #bigCards{ display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; align-items:start; }
+    #bigCards{ display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; align-items:stretch; }
     .big-card{ margin-bottom: 0; }
 
-    #accordionList{ display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; align-items:start; }
+    #accordionList{ display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; align-items:stretch; }
     .upcoming-group{ margin-bottom: 0; }
   }
 </style>
@@ -702,6 +703,34 @@ function todayStr(){
   const dd = String(d.getDate()).padStart(2,'0');
   return d.getFullYear() + '-' + mm + '-' + dd;
 }
+
+// ---------- lector de tiempo: auto-archivo semanal ----------
+// La quincena/semana activa "vence" el domingo que sigue (o coincide con)
+// su end_date. Al vencer, se limpia sola (igual que "Vaciar quincena") y
+// no vuelve a mostrar nada hasta que se suba un nuevo PDF.
+function computeAutoExpiry(period){
+  const end = parseLocalDate(period.end_date);
+  const dow = end.getDay(); // 0 = domingo
+  const daysUntilSunday = (7 - dow) % 7; // 0 si end_date ya es domingo
+  return new Date(end.getFullYear(), end.getMonth(), end.getDate() + daysUntilSunday);
+}
+function isPeriodExpired(period){
+  if(!period || !period.end_date) return false;
+  const expiry = computeAutoExpiry(period);
+  const today = parseLocalDate(todayStr());
+  return today.getTime() >= expiry.getTime();
+}
+async function autoArchiveExpiredPeriod(){
+  try{
+    const { error } = await sb.rpc('reset_current_period');
+    if(error) throw error;
+  }catch(e){
+    showError('No se pudo archivar automáticamente la quincena vencida: ' + e.message);
+  }
+  currentPeriod = null;
+  TASKS = [];
+}
+
 function showError(msg){
   const b = document.getElementById('errorBanner');
   if(b){ b.style.display='block'; b.textContent = msg; }
@@ -1025,6 +1054,10 @@ async function loadAll(){
       .from('periods').select('*').order('created_at', { ascending: false }).limit(1);
     if(periodsErr) throw periodsErr;
     currentPeriod = (periods && periods[0]) || null;
+
+    if(currentPeriod && isPeriodExpired(currentPeriod)){
+      await autoArchiveExpiredPeriod();
+    }
 
     if(currentPeriod){
       const { data: tasks, error: tasksErr } = await sb
