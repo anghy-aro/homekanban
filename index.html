@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root{
     --bg: #F3F5F8;
@@ -146,6 +147,8 @@
     color: white;
     display:flex; align-items:center; justify-content:center;
     font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
   }
 
   .kid-pills{ display:flex; gap: 8px; margin-top: 14px; overflow-x:auto; justify-content:center; }
@@ -159,12 +162,6 @@
   .pill .dot{ width:7px; height:7px; border-radius:50%; background: var(--ink-faint); }
   .pill.active{ background: linear-gradient(180deg, var(--purple), var(--purple-dark)); color: white; box-shadow: 0 3px 0 rgba(108,63,224,0.35); }
   .pill.active .dot{ background: white; }
-  .pill[data-kid="ben"] .dot{ background: var(--blue); }
-  .pill[data-kid="nico"] .dot{ background: var(--green); }
-  .pill[data-kid="ben"].active{ background: linear-gradient(180deg, var(--blue), var(--blue-dark)); box-shadow: 0 3px 0 rgba(31,127,174,0.35); }
-  .pill[data-kid="ben"].active .dot{ background: white; }
-  .pill[data-kid="nico"].active{ background: linear-gradient(180deg, var(--green), var(--green-dark)); box-shadow: 0 3px 0 rgba(31,143,98,0.35); }
-  .pill[data-kid="nico"].active .dot{ background: white; }
 
   .summary-row{
     display:flex; align-items:center; justify-content:center; gap: 14px; margin-top: 12px;
@@ -173,8 +170,6 @@
   }
   .summary-row .item{ display:flex; align-items:center; gap:6px; }
   .summary-row .item .sw{ width:8px; height:8px; border-radius:50%; }
-  .summary-row .item.ben .sw{ background: var(--blue); }
-  .summary-row .item.nico .sw{ background: var(--green); }
   .summary-row .count{ color: var(--ink); }
 
   .type-tabs{ display:flex; gap: 5px; margin-top: 12px; background: rgba(255,255,255,0.55); border-radius: var(--radius-md); padding: 4px; }
@@ -190,7 +185,7 @@
   .date-range{ display:flex; align-items:center; gap:6px; font-size: 13.5px; font-weight: 800; color: var(--ink); }
   .total-pill{ font-size: 11.5px; font-weight: 800; color: white; background: linear-gradient(180deg, var(--coral), var(--coral-dark)); padding: 6px 12px; border-radius: 999px; box-shadow: 0 2px 0 rgba(233,80,63,.35); }
 
-  .day-selector{ display:grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 18px; }
+  .day-selector{ display:grid; grid-template-columns: repeat(auto-fit, minmax(64px, 1fr)); gap: 8px; margin-bottom: 18px; }
   .day-box{ background: var(--paper); border: 1.5px solid var(--line); border-radius: var(--radius-md); padding: 9px 4px 8px; text-align:center; cursor:pointer; }
   .day-box .dow{ font-size: 10.5px; font-weight: 800; color: var(--ink-soft); letter-spacing: .02em; }
   .day-box .dom{ font-family: var(--font-display); font-size: 20px; font-weight: 700; margin: 2px 0 3px; color: var(--ink); }
@@ -208,17 +203,11 @@
     border-radius: var(--radius-lg); padding: 14px 14px 12px; margin-bottom: 12px;
     box-shadow: 0 4px 14px rgba(120,110,160,.08); position: relative;
   }
-  .big-card[data-kid="ben"]{ border-left-color: var(--blue); }
-  .big-card[data-kid="nico"]{ border-left-color: var(--green); }
   .big-card.done{ opacity: .55; }
 
   .big-card-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom: 9px; }
   .kid-tag{ display:flex; align-items:center; gap:6px; font-size: 12.5px; font-weight: 700; }
   .kid-tag .av{ width: 20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; }
-  .kid-tag[data-kid="ben"] .av{ background: var(--blue-tint); }
-  .kid-tag[data-kid="nico"] .av{ background: var(--green-tint); }
-  .kid-tag[data-kid="ben"]{ color: var(--blue-dark); }
-  .kid-tag[data-kid="nico"]{ color: var(--green-dark); }
 
   .type-badge{ font-size: 10.5px; font-weight: 800; letter-spacing: .02em; padding: 3px 9px; border-radius: 999px; }
   .type-badge.material{ background: var(--material-tint); color: var(--material); }
@@ -230,8 +219,8 @@
   .big-card .desc{ font-size: 13.5px; color: var(--ink-soft); line-height: 1.4; margin-bottom: 10px; }
   .big-card.done .title{ text-decoration: line-through; color: var(--ink-faint); }
 
-  .big-card-bottom{ display:flex; align-items:center; justify-content:space-between; padding-top: 9px; border-top: 1px solid var(--line); }
-  .context-line{ display:flex; align-items:center; gap:5px; font-size:11.5px; color: var(--ink-faint); font-weight:600; }
+  .big-card-bottom{ display:flex; align-items:center; justify-content:space-between; padding-top: 9px; border-top: 1px solid var(--line); gap: 8px; flex-wrap: wrap; }
+  .context-line{ display:flex; align-items:center; gap:5px; font-size:11.5px; color: var(--ink-faint); font-weight:600; flex-wrap: wrap; }
   .status-pill{ font-size: 10.5px; font-weight:700; padding: 3px 8px; border-radius: 999px; }
   .status-pill.pending{ background:#FFF1E8; color:#C9701F; }
   .status-pill.done{ background: var(--green-tint); color: var(--green-dark); }
@@ -268,13 +257,9 @@
   .mini-row{ display:flex; align-items:center; gap: 10px; padding: 10px 13px; border-bottom: 1px solid var(--line); }
   .mini-row:last-child{ border-bottom: none; }
   .mini-bar{ width: 3px; align-self:stretch; border-radius:3px; flex:none; }
-  .mini-bar.ben{ background: var(--blue); }
-  .mini-bar.nico{ background: var(--green); }
   .mini-body{ flex:1; min-width:0; }
   .mini-meta{ display:flex; align-items:center; gap:6px; margin-bottom: 3px; }
   .mini-kid{ font-size: 11px; font-weight: 800; }
-  .mini-kid.ben{ color: var(--blue-dark); }
-  .mini-kid.nico{ color: var(--green-dark); }
   .mini-type{ font-size: 9.5px; font-weight: 800; padding: 1.5px 7px; border-radius: 999px; }
   .mini-type.material{ background: var(--material-tint); color: var(--material); }
   .mini-type.tarea{ background: var(--tarea-tint); color: var(--tarea); }
@@ -337,7 +322,7 @@
   .form-field{ display:flex; flex-direction:column; gap:5px; }
   .form-field.full{ grid-column: 1 / -1; }
   .form-field label{ font-size: 11.5px; font-weight: 700; color: var(--ink-soft); }
-  .form-field select, .form-field input[type="text"], .form-field textarea{
+  .form-field select, .form-field input[type="text"], .form-field input[type="date"], .form-field textarea{
     border: 1.5px solid var(--line); border-radius: 9px; padding: 9px 10px; font-size: 13.5px;
     font-family: inherit; background: var(--paper); color: var(--ink);
   }
@@ -363,6 +348,22 @@
   .manage-row .manage-body .t2{ color: var(--ink-faint); font-size:11px; }
   .manage-row .del{ color: var(--material); font-size: 16px; cursor:pointer; flex:none; padding: 4px; }
 
+  /* ---------- WHO ARE YOU MODAL ---------- */
+  .who-modal{
+    position:fixed; inset:0; background:rgba(38,33,56,0.55); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+    z-index:100; display:none; align-items:center; justify-content:center; padding:20px;
+  }
+  .who-modal.open{ display:flex; }
+  .who-card{ background:var(--paper); border-radius: var(--radius-lg); padding:22px; max-width:360px; width:100%; text-align:center; box-shadow: 0 20px 60px rgba(20,25,40,.25); }
+  .who-card h2{ font-family:var(--font-display); margin:0 0 6px; color:var(--purple); font-size:22px; }
+  .who-card p.hint{ font-size:12.5px; color:var(--ink-soft); margin:0 0 16px; line-height: 1.4; }
+  .who-pills{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-bottom:16px; }
+  .who-pill{ padding:10px 16px; border-radius:999px; font-weight:700; font-size:13.5px; cursor:pointer; background:#EEF0F4; color:var(--ink); }
+  .who-other{ display:flex; gap:8px; }
+  .who-other input{ flex:1; border:1.5px solid var(--line); border-radius:9px; padding:9px 10px; font-size:13.5px; font-family:inherit; }
+  .who-other .btn{ width:auto; padding:9px 14px; }
+  .who-close{ margin-top: 14px; font-size: 12px; color: var(--ink-faint); cursor:pointer; font-weight: 700; }
+
   @media (min-width: 480px){
     body{ background: #E4E7EC; }
     .app{ box-shadow: 0 0 0 1px var(--line), 0 20px 60px rgba(20,25,40,.12); margin-top: 18px; margin-bottom: 18px; border-radius: 28px; overflow:hidden; }
@@ -384,16 +385,12 @@
         <div class="icon-btn" id="openUploadTop" title="Actualizar semana">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M12 18v-6M9.5 15.5L12 18l2.5-2.5"/></svg>
         </div>
-        <div class="avatar-btn">👤</div>
+        <div class="avatar-btn" id="avatarBtn" title="¿Quién eres?">👤</div>
       </div>
     </div>
     <div class="subtitle-line">Tareas · Materiales · Actividades de la semana</div>
 
-    <div class="kid-pills" id="kidPills">
-      <div class="pill active" data-kid="all"><span class="dot"></span>Todos</div>
-      <div class="pill" data-kid="ben"><span class="dot"></span>Ben • Nursery</div>
-      <div class="pill" data-kid="nico"><span class="dot"></span>Nico • 3ro A</div>
-    </div>
+    <div class="kid-pills" id="kidPills"></div>
 
     <div class="summary-row" id="summaryRow"></div>
 
@@ -457,6 +454,20 @@
 
 </div>
 
+<!-- ============ WHO ARE YOU MODAL ============ -->
+<div class="who-modal" id="whoModal">
+  <div class="who-card">
+    <h2>¿Quién eres?</h2>
+    <p class="hint">Así sabemos quién marcó cada pendiente como completado.</p>
+    <div class="who-pills" id="whoPills"></div>
+    <div class="who-other">
+      <input type="text" id="whoOtherInput" placeholder="Otro nombre...">
+      <button class="btn btn-secondary" id="whoOtherBtn">Usar</button>
+    </div>
+    <div class="who-close" id="whoCloseBtn">Cancelar</div>
+  </div>
+</div>
+
 <!-- ============ UPLOAD / MANAGE VIEW ============ -->
 <div class="upload-view" id="uploadView">
   <div class="upload-header">
@@ -466,32 +477,20 @@
   <div class="upload-body">
 
     <div class="card-block">
-      <h3>Fechas de esta semana</h3>
-      <p class="hint">Se muestran en la parte de arriba de la app.</p>
+      <h3>Fechas de esta quincena</h3>
+      <p class="hint">Se muestran en la parte de arriba de la app. Al guardar una fecha de inicio y fin nuevas, se conservan los pendientes ya agregados con esas fechas.</p>
       <div class="form-grid">
         <div class="form-field full">
           <label>Texto del rango (ej. "7 – 10 de septiembre")</label>
           <input type="text" id="inputWeekLabel">
         </div>
         <div class="form-field">
-          <label>Fecha Lunes</label>
-          <input type="text" id="inputDomLunes" placeholder="7">
+          <label>Fecha inicio</label>
+          <input type="date" id="inputStartDate">
         </div>
         <div class="form-field">
-          <label>Fecha Martes</label>
-          <input type="text" id="inputDomMartes" placeholder="8">
-        </div>
-        <div class="form-field">
-          <label>Fecha Miércoles</label>
-          <input type="text" id="inputDomMiercoles" placeholder="9">
-        </div>
-        <div class="form-field">
-          <label>Fecha Jueves</label>
-          <input type="text" id="inputDomJueves" placeholder="10">
-        </div>
-        <div class="form-field full">
-          <label>Mes (ej. "de Septiembre")</label>
-          <input type="text" id="inputMonthText" placeholder="de Septiembre">
+          <label>Fecha fin</label>
+          <input type="date" id="inputEndDate">
         </div>
       </div>
       <button class="btn btn-secondary" id="saveDatesBtn">Guardar fechas</button>
@@ -509,20 +508,12 @@
       <p class="hint">Llena estos campos por cada tarea, material o actividad que veas en el PDF.</p>
       <div class="form-grid">
         <div class="form-field">
-          <label>Día</label>
-          <select id="fDay">
-            <option value="lunes">Lunes</option>
-            <option value="martes">Martes</option>
-            <option value="miercoles">Miércoles</option>
-            <option value="jueves">Jueves</option>
-          </select>
+          <label>Fecha</label>
+          <input type="date" id="fDate">
         </div>
         <div class="form-field">
           <label>Hijo</label>
-          <select id="fKid">
-            <option value="ben">Ben (Nursery)</option>
-            <option value="nico">Nico (3ro A)</option>
-          </select>
+          <select id="fKid"></select>
         </div>
         <div class="form-field">
           <label>Tipo</label>
@@ -561,7 +552,7 @@
       <div id="manageList"></div>
     </div>
 
-    <button class="btn btn-danger" id="resetBtn">Vaciar toda la semana y empezar de nuevo</button>
+    <button class="btn btn-danger" id="resetBtn">Vaciar toda la quincena y empezar de nuevo</button>
   </div>
 </div>
 
@@ -571,34 +562,12 @@ window.addEventListener('error', function(e){
   if(b){ b.style.display='block'; b.textContent = 'Ocurrió un problema cargando la app: ' + e.message; }
 });
 
-/* ---------------- STORAGE (works inside Claude, falls back to the phone's browser storage) ---------------- */
-function hasClaudeStorage(){
-  return typeof window.storage !== 'undefined' && typeof window.storage.get === 'function';
-}
-async function storageGet(key){
-  if(hasClaudeStorage()){
-    try{ const r = await window.storage.get(key, false); return r ? r.value : null; }catch(e){}
-  }
-  try{ return localStorage.getItem(key); }catch(e){ return null; }
-}
-async function storageSet(key, value){
-  if(hasClaudeStorage()){
-    try{ await window.storage.set(key, value, false); return; }catch(e){}
-  }
-  try{ localStorage.setItem(key, value); }catch(e){}
-}
+/* ---------------- CONFIG ---------------- */
+const SUPABASE_URL = 'https://kzxxybjrudmtvmrukvwk.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_j2H3Z66EyUBC3XM98MDdaw_p0FhQbMu';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-const DATA_KEY = 'pendientes-data-v3';
-const CHECKS_KEY = 'pendientes-checks-v3';
-
-const DOW_LABELS = { lunes:'LUN', martes:'MAR', miercoles:'MIÉ', jueves:'JUE' };
-const DOW_FULL = { lunes:'Lunes', martes:'Martes', miercoles:'Miércoles', jueves:'Jueves' };
-const CHIP_STYLES = {
-  lunes:     { chip:'#EEF0F4', chipText:'#4B5160' },
-  martes:    { chip:'#E8F0FE', chipText:'#2F6FED' },
-  miercoles: { chip:'#FFF1E8', chipText:'#C9701F' },
-  jueves:    { chip:'#F1E7FB', chipText:'#8A3FD1' },
-};
+const PERSON_KEY = 'homekanban-person-v1';
 
 const TYPE_INFO = {
   material:  { label:'Material',  cls:'material',  checkLabel:'Listo en mochila', context:'Antes de la clase' },
@@ -606,104 +575,194 @@ const TYPE_INFO = {
   actividad: { label:'Actividad', cls:'actividad',  checkLabel:'Confirmado',        context:'Preparar con anticipación' },
 };
 
-const DEFAULT_DATA = {
-  weekLabel: '7 – 10 de septiembre',
-  monthText: 'de Septiembre',
-  dom: { lunes:7, martes:8, miercoles:9, jueves:10 },
-  items: {
-    lunes: [
-      { kid:'nico', tipo:'tarea', subject:'Comunicación y Lenguaje', title:'Proyecto "Cantando y escribiendo a Guatemala"', desc:'Fase II: resolver dudas y consultar el documento disponible en la plataforma.' },
-      { kid:'nico', tipo:'tarea', subject:'Spelling', title:'Practicar Vocabulary 4', desc:'Estudiar para el dictado del jueves 10.', points:'3 pts' },
-      { kid:'ben', tipo:'tarea', subject:'Language Arts', title:'Practicar vocabulario de la semana', desc:'Prepararse para el examen del viernes.' },
-      { kid:'ben', tipo:'tarea', subject:'Language Arts', title:'Completar Project U-4', desc:'Terminar el proyecto en casa para entregarlo en la fecha indicada.' },
-      { kid:'ben', tipo:'tarea', subject:'Comunicación y Lenguaje', title:'Repaso de vocales y rimas', desc:'Practicar el sonido de las vocales.' },
-      { kid:'ben', tipo:'tarea', subject:'Orientación Cristiana', title:'Orar en familia', desc:'Recordar orar con los papás en todo momento.' },
-    ],
-    martes: [
-      { kid:'nico', tipo:'tarea', subject:'Language Arts', title:'Estudiar Vocabulary 4', desc:'Dictado el jueves 10.' },
-      { kid:'nico', tipo:'tarea', subject:'Matemática', title:'Escribir expresiones', desc:'Resolver páginas 531 y 532.' },
-      { kid:'nico', tipo:'tarea', subject:'Comunicación y Lenguaje', title:'Presentación de poema o canción', desc:'Claves 1 a 10. Presentarse con traje típico e instrumento si se requiere.' },
-      { kid:'nico', tipo:'material', subject:'Natación', title:'Equipo de natación', desc:'Gorra, lentes, calzoneta del uniforme, toalla o bata y ginas.' },
-      { kid:'nico', tipo:'material', subject:'Language Arts', title:'Imprimir Voc. 4 - Unit 4.pdf', desc:'Descargar y llevar el recurso impreso.' },
-      { kid:'nico', tipo:'material', subject:'Geografía', title:'4 imágenes de accidentes geográficos', desc:'Bahía, península, golfo y cabo. Aprox. 10 × 15 cm cada una.' },
-      { kid:'ben', tipo:'tarea', subject:'Conocimiento de su mundo', title:'Buscar símbolos patrios', desc:'Con ayuda de un adulto, buscar imágenes para repasar en casa.' },
-      { kid:'ben', tipo:'tarea', subject:'Destrezas de Aprendizaje', title:'Repasar trazo del 1 al 8', desc:'Practicar también conteo con juguetes o en familia.' },
-      { kid:'ben', tipo:'material', subject:'Natación', title:'Implementos de natación', desc:'Todo identificado con nombre.' },
-      { kid:'ben', tipo:'material', subject:'Language Arts', title:'Materiales para actividad', desc:'Botella plástica cortada por la mitad (con boquilla), papel manila y 3 ligas para el cabello.' },
-    ],
-    miercoles: [
-      { kid:'nico', tipo:'tarea', subject:'Caligrafía', title:'Páginas 96 y 97', desc:'Realizar las páginas del libro de caligrafía.' },
-      { kid:'nico', tipo:'actividad', subject:'Devocional', title:'Taller "Los valores"', desc:'Actividad devocional en el colegio.', points:'15 pts' },
-      { kid:'ben', tipo:'material', subject:'Comunicación y Lenguaje', title:'Hoja de rimas impresa', desc:'Descargar del área de recursos y llevarla impresa.' },
-      { kid:'ben', tipo:'material', subject:'Conocimiento de su mundo', title:'Comida típica favorita', desc:'Chuchito, tostada, rellenito, mole, doblada, etc.' },
-      { kid:'ben', tipo:'actividad', subject:'Devocional', title:'Actividad devocional del día', desc:'Participación en clase.' },
-    ],
-    jueves: [
-      { kid:'nico', tipo:'tarea', subject:'Writing and Reading', title:'"Germs - chapter 1" en Richmond Studio', desc:'Leer la historia y completar los ejercicios en la plataforma.', points:'5 pts' },
-      { kid:'nico', tipo:'tarea', subject:'Comunicación y Lenguaje', title:'Presentación de poema o canción', desc:'Claves 11 a 20.' },
-      { kid:'nico', tipo:'tarea', subject:'Spelling', title:'Dictado #3', desc:'Preparar vocabulario para el dictado.', points:'3 pts' },
-      { kid:'nico', tipo:'tarea', subject:'Matemática', title:'Evaluar expresiones', desc:'Resolver páginas 537 y 538.' },
-      { kid:'nico', tipo:'tarea', subject:'Language Arts', title:'Dictado #4', desc:'Dictado de vocabulario del día.', points:'4 pts' },
-      { kid:'nico', tipo:'material', subject:'Educación Física', title:'Uniforme completo de deporte', desc:'Presentarse con uniforme y tenis.' },
-      { kid:'nico', tipo:'actividad', subject:'Escuela para padres', title:'Sesión presencial', desc:'Zona 5, 18:00 hrs. Asistencia importante.', points:'15 pts devocional + 10 pts Orientación' },
-      { kid:'ben', tipo:'material', subject:'Comunicación y Lenguaje', title:'Hoja de patrones impresa', desc:'Descargar del área de recursos y llevarla impresa.' },
-      { kid:'ben', tipo:'material', subject:'Language Arts', title:'Bolsita de fideos espirales', desc:'Llevar una pequeña bolsa para actividad en clase.' },
-      { kid:'ben', tipo:'material', subject:'Conocimiento de su mundo', title:'Dulces típicos + 6 plumas verdes', desc:'Dulces para compartir con compañeros por fiestas patrias.' },
-      { kid:'ben', tipo:'actividad', subject:'Escuela para padres', title:'Iglesia Ministerios Ebenezer', desc:'18:00 hrs. Asistencia importante.', points:'15 pts devocional + 10 pts Orientación' },
-    ],
-  }
-};
+const DOW_FULL = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+const DOW_SHORT = ['DOM','LUN','MAR','MIÉ','JUE','VIE','SÁB'];
+const CHIP_PALETTE = [
+  { chip:'#EEF0F4', chipText:'#4B5160' },
+  { chip:'#E8F0FE', chipText:'#2F6FED' },
+  { chip:'#FFF1E8', chipText:'#C9701F' },
+  { chip:'#F1E7FB', chipText:'#8A3FD1' },
+];
+const KID_PALETTE = [
+  { main:'#33B27E', dark:'#1F8F62', tint:'#E4F7EE' },
+  { main:'#3AA8D8', dark:'#1F7FAE', tint:'#E6F5FB' },
+  { main:'#FF6F61', dark:'#E9503F', tint:'#FFE8E4' },
+  { main:'#8A5CF6', dark:'#6C3FE0', tint:'#F1EBFE' },
+];
 
-let DATA = JSON.parse(JSON.stringify(DEFAULT_DATA));
-let checkedState = {};
-let currentDay = 'lunes';
+/* ---------------- STATE ---------------- */
+let PEOPLE = [];          // [{id, name}]
+let PEOPLE_BY_ID = {};
+let KIDS = [];             // [{id, name, emoji}] ordered by created_at
+let KIDS_BY_ID = {};
+let currentPeriod = null;  // {id, label, start_date, end_date}
+let TASKS = [];            // task rows for currentPeriod
+
+let currentPerson = null;  // {id, name} or null
 let currentKid = 'all';
 let currentType = 'all';
+let currentDay = null;     // 'YYYY-MM-DD'
 let collapsedAccordions = {};
 
-function getDays(){
-  return ['lunes','martes','miercoles','jueves'].map(key => ({
-    key,
-    dow: DOW_LABELS[key],
-    dom: DATA.dom[key],
-    full: DOW_FULL[key] + ' ' + DATA.dom[key] + ' ' + DATA.monthText,
-    chip: CHIP_STYLES[key].chip,
-    chipText: CHIP_STYLES[key].chipText,
-  }));
+/* ---------------- utils ---------------- */
+function parseLocalDate(dateStr){
+  // avoid timezone shifting a plain YYYY-MM-DD string
+  const [y,m,d] = dateStr.split('-').map(Number);
+  return new Date(y, m-1, d);
+}
+function todayStr(){
+  const d = new Date();
+  const mm = String(d.getMonth()+1).padStart(2,'0');
+  const dd = String(d.getDate()).padStart(2,'0');
+  return d.getFullYear() + '-' + mm + '-' + dd;
+}
+function showError(msg){
+  const b = document.getElementById('errorBanner');
+  if(b){ b.style.display='block'; b.textContent = msg; }
+}
+function clearError(){
+  const b = document.getElementById('errorBanner');
+  if(b){ b.style.display='none'; b.textContent=''; }
 }
 
-function itemId(dayKey, idx){ return dayKey + '-' + idx; }
-function matchesFilter(it){
-  if(currentKid !== 'all' && it.kid !== currentKid) return false;
-  if(currentType !== 'all' && it.tipo !== currentType) return false;
+function kidColor(kidId){
+  const idx = KIDS.findIndex(k => k.id === kidId);
+  return KID_PALETTE[(idx >= 0 ? idx : 0) % KID_PALETTE.length];
+}
+function kidLabel(kidId){ return (KIDS_BY_ID[kidId] && KIDS_BY_ID[kidId].name) || '—'; }
+function kidAvatar(kidId){ return (KIDS_BY_ID[kidId] && KIDS_BY_ID[kidId].emoji) || '🧒'; }
+function personName(id){ return id && PEOPLE_BY_ID[id] ? PEOPLE_BY_ID[id].name : null; }
+
+function getDays(){
+  const set = new Set(TASKS.map(t => t.day_date));
+  const arr = Array.from(set).sort();
+  return arr.map((dateStr, i) => {
+    const d = parseLocalDate(dateStr);
+    const palette = CHIP_PALETTE[i % CHIP_PALETTE.length];
+    return {
+      key: dateStr,
+      dow: DOW_SHORT[d.getDay()],
+      dom: d.getDate(),
+      full: DOW_FULL[d.getDay()] + ' ' + d.getDate() + ' de ' + d.toLocaleDateString('es-ES', { month: 'long' }),
+      chip: palette.chip,
+      chipText: palette.chipText,
+    };
+  });
+}
+
+function itemsForDay(dateStr){ return TASKS.filter(t => t.day_date === dateStr); }
+function matchesFilter(t){
+  if(currentKid !== 'all' && t.kid_id !== currentKid) return false;
+  if(currentType !== 'all' && t.item_type !== currentType) return false;
   return true;
 }
-function dayCounts(dayKey){ return DATA.items[dayKey].filter(matchesFilter).length; }
-function dayPendingCounts(dayKey){
-  return DATA.items[dayKey].map((it,i)=>({it,i})).filter(({it})=>matchesFilter(it))
-    .filter(({i}) => !checkedState[itemId(dayKey,i)]).length;
-}
-function kidLabel(kid){ return kid === 'ben' ? 'Ben' : 'Nico'; }
-function kidAvatar(kid){ return kid === 'ben' ? '👶' : '🧒'; }
+function dayCounts(dateStr){ return itemsForDay(dateStr).filter(matchesFilter).length; }
+function dayPendingCounts(dateStr){ return itemsForDay(dateStr).filter(matchesFilter).filter(t => !t.completed).length; }
 
-function renderKidPills(){
-  document.querySelectorAll('.pill').forEach(p=> p.classList.toggle('active', p.dataset.kid === currentKid));
+/* ---------------- WHO ARE YOU ---------------- */
+function loadStoredPerson(){
+  try{
+    const raw = localStorage.getItem(PERSON_KEY);
+    if(raw) currentPerson = JSON.parse(raw);
+  }catch(e){ currentPerson = null; }
 }
+function storeCurrentPerson(){
+  try{ localStorage.setItem(PERSON_KEY, JSON.stringify(currentPerson)); }catch(e){}
+}
+function updateAvatarBtn(){
+  const el = document.getElementById('avatarBtn');
+  if(!el) return;
+  if(currentPerson && currentPerson.name){
+    el.textContent = currentPerson.name.trim()[0].toUpperCase();
+  }else{
+    el.textContent = '👤';
+  }
+}
+function renderWhoPills(){
+  const wrap = document.getElementById('whoPills');
+  wrap.innerHTML = '';
+  PEOPLE.forEach(p => {
+    const el = document.createElement('div');
+    el.className = 'who-pill';
+    el.textContent = p.name;
+    el.onclick = () => choosePerson(p.id, p.name);
+    wrap.appendChild(el);
+  });
+}
+function openWhoModal(){
+  renderWhoPills();
+  document.getElementById('whoOtherInput').value = '';
+  document.getElementById('whoModal').classList.add('open');
+}
+function closeWhoModal(){
+  document.getElementById('whoModal').classList.remove('open');
+}
+function choosePerson(id, name){
+  currentPerson = { id, name };
+  storeCurrentPerson();
+  updateAvatarBtn();
+  closeWhoModal();
+}
+async function chooseOtherPerson(){
+  const input = document.getElementById('whoOtherInput');
+  const name = input.value.trim();
+  if(!name) return;
+  const existing = PEOPLE.find(p => p.name.toLowerCase() === name.toLowerCase());
+  if(existing){ choosePerson(existing.id, existing.name); return; }
+  try{
+    const { data, error } = await sb.from('people').insert({ name }).select().single();
+    if(error) throw error;
+    PEOPLE.push(data);
+    PEOPLE_BY_ID[data.id] = data;
+    choosePerson(data.id, data.name);
+  }catch(e){
+    showError('No se pudo guardar el nombre: ' + e.message);
+  }
+}
+
+/* ---------------- RENDER ---------------- */
+function renderKidPills(){
+  const wrap = document.getElementById('kidPills');
+  wrap.innerHTML = '';
+  const allPill = document.createElement('div');
+  allPill.className = 'pill' + (currentKid === 'all' ? ' active' : '');
+  allPill.innerHTML = '<span class="dot"></span>Todos';
+  allPill.onclick = () => { currentKid = 'all'; render(); };
+  wrap.appendChild(allPill);
+
+  KIDS.forEach(k => {
+    const color = kidColor(k.id);
+    const active = currentKid === k.id;
+    const pill = document.createElement('div');
+    pill.className = 'pill' + (active ? ' active' : '');
+    if(active){
+      pill.style.background = 'linear-gradient(180deg, ' + color.main + ', ' + color.dark + ')';
+      pill.style.boxShadow = '0 3px 0 ' + color.dark + '55';
+      pill.style.color = 'white';
+    }
+    pill.innerHTML = '<span class="dot" style="background:' + (active ? 'white' : color.main) + '"></span>' + k.name;
+    pill.onclick = () => { currentKid = k.id; render(); };
+    wrap.appendChild(pill);
+  });
+}
+
 function renderSummary(){
   const el = document.getElementById('summaryRow');
-  const days = ['lunes','martes','miercoles','jueves'];
-  const allCount = days.reduce((s,d)=> s + DATA.items[d].filter(it => currentType==='all' || it.tipo===currentType).length, 0);
-  const benCount = days.reduce((s,d)=> s + DATA.items[d].filter(it => it.kid==='ben' && (currentType==='all' || it.tipo===currentType)).length, 0);
-  const nicoCount = days.reduce((s,d)=> s + DATA.items[d].filter(it => it.kid==='nico' && (currentType==='all' || it.tipo===currentType)).length, 0);
-  el.innerHTML = `
-    <div class="item"><span>Todos <span class="count">(${allCount})</span></span></div>
-    <div class="item ben"><span class="sw"></span>Ben • Nursery <span class="count">${benCount}</span></div>
-    <div class="item nico"><span class="sw"></span>Nico • 3ro A <span class="count">${nicoCount}</span></div>
-  `;
+  const byType = t => currentType === 'all' || t.item_type === currentType;
+  const allCount = TASKS.filter(byType).length;
+  let html = '<div class="item"><span>Todos <span class="count">(' + allCount + ')</span></span></div>';
+  KIDS.forEach(k => {
+    const color = kidColor(k.id);
+    const count = TASKS.filter(t => t.kid_id === k.id && byType(t)).length;
+    html += '<div class="item"><span class="sw" style="background:' + color.main + '"></span>' + k.name + ' <span class="count">' + count + '</span></div>';
+  });
+  el.innerHTML = html;
 }
+
 function renderTypeTabs(){
   document.querySelectorAll('.type-tab').forEach(t=> t.classList.toggle('active', t.dataset.type === currentType));
 }
+
 function renderDaySelector(){
   const wrap = document.getElementById('daySelector');
   wrap.innerHTML = '';
@@ -711,61 +770,72 @@ function renderDaySelector(){
     const box = document.createElement('div');
     box.className = 'day-box' + (d.key===currentDay ? ' active' : '');
     const c = dayCounts(d.key);
-    box.innerHTML = `<div class="dow">${d.dow}</div><div class="dom">${d.dom}</div><div class="cnt">${c} item${c===1?'':'s'}</div>`;
+    box.innerHTML = '<div class="dow">'+d.dow+'</div><div class="dom">'+d.dom+'</div><div class="cnt">'+c+' item'+(c===1?'':'s')+'</div>';
     box.onclick = () => { currentDay = d.key; render(); };
     wrap.appendChild(box);
   });
 }
+
 function renderTotalPill(){
-  const total = ['lunes','martes','miercoles','jueves'].reduce((s,d)=> s + dayPendingCounts(d), 0);
+  const days = getDays();
+  const total = days.reduce((s,d)=> s + dayPendingCounts(d.key), 0);
   document.getElementById('totalPill').textContent = total + ' pendiente' + (total===1?'':'s') + ' totales';
-  document.getElementById('weekLabelText').textContent = DATA.weekLabel;
+  document.getElementById('weekLabelText').textContent = (currentPeriod && currentPeriod.label) || 'Sin quincena activa';
 }
 
 function renderBigCards(){
-  const dayInfo = getDays().find(d=>d.key===currentDay);
-  document.getElementById('selectedDayTitle').textContent = dayInfo.full;
-
-  const items = DATA.items[currentDay].map((it,i)=>({...it, idx:i})).filter(matchesFilter);
-  const pending = items.filter(it => !checkedState[itemId(currentDay, it.idx)]).length;
-  document.getElementById('priorityCount').textContent = pending;
+  const days = getDays();
+  const dayInfo = days.find(d=>d.key===currentDay) || days[0];
+  document.getElementById('selectedDayTitle').textContent = dayInfo ? dayInfo.full : 'Sin pendientes';
 
   const wrap = document.getElementById('bigCards');
   wrap.innerHTML = '';
+
+  if(!dayInfo){
+    document.getElementById('priorityCount').textContent = '0';
+    wrap.innerHTML = '<div class="empty-state">Todavía no hay pendientes cargados. Usa "Subir PDFs" para agregar la quincena.</div>';
+    return;
+  }
+
+  const items = itemsForDay(dayInfo.key).filter(matchesFilter);
+  const pending = items.filter(t => !t.completed).length;
+  document.getElementById('priorityCount').textContent = pending;
+
   if(items.length === 0){
     wrap.innerHTML = '<div class="empty-state">No hay pendientes para este día con el filtro actual.</div>';
     return;
   }
-  items.forEach(it=>{
-    const id = itemId(currentDay, it.idx);
-    const done = !!checkedState[id];
-    const info = TYPE_INFO[it.tipo];
+  items.forEach(t=>{
+    const done = !!t.completed;
+    const info = TYPE_INFO[t.item_type];
+    const color = kidColor(t.kid_id);
     const card = document.createElement('div');
     card.className = 'big-card' + (done ? ' done' : '');
-    card.dataset.kid = it.kid;
+    card.style.borderLeftColor = color.main;
+    const doneName = done ? personName(t.completed_by_id) : null;
     card.innerHTML = `
-      <div class="delete-x" data-day="${currentDay}" data-idx="${it.idx}">✕</div>
+      <div class="delete-x" data-id="${t.id}">✕</div>
       <div class="big-card-top">
-        <div class="kid-tag" data-kid="${it.kid}"><span class="av">${kidAvatar(it.kid)}</span>${kidLabel(it.kid)} • ${it.kid==='ben' ? 'Nursery' : '3ro A'}</div>
+        <div class="kid-tag" style="color:${color.dark}"><span class="av" style="background:${color.tint}">${kidAvatar(t.kid_id)}</span>${kidLabel(t.kid_id)}</div>
         <div class="type-badge ${info.cls}">${info.label.toUpperCase()}</div>
       </div>
-      <div class="subject">${it.subject}</div>
-      <div class="title">${it.title}</div>
-      <div class="desc">${it.desc}${it.points ? ' <strong>· '+it.points+'</strong>' : ''}</div>
+      <div class="subject">${t.subject || ''}</div>
+      <div class="title">${t.title}</div>
+      <div class="desc">${t.description || ''}${t.note ? ' <strong>· '+t.note+'</strong>' : ''}</div>
       <div class="big-card-bottom">
         <div class="context-line">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
           ${info.context}
-          <span class="status-pill ${done ? 'done' : 'pending'}">${done ? 'Listo' : 'Pendiente'}</span>
+          <span class="status-pill ${done ? 'done' : 'pending'}">${done ? ('Listo' + (doneName ? ' · '+doneName : '')) : 'Pendiente'}</span>
         </div>
         <div class="check-row">
           <span class="check-label">${info.checkLabel}</span>
-          <div class="checkbox ${done ? 'checked' : ''}" data-id="${id}"></div>
+          <div class="checkbox ${done ? 'checked' : ''}" data-id="${t.id}"></div>
         </div>
       </div>
     `;
-    card.querySelector('.checkbox').onclick = () => { checkedState[id] = !checkedState[id]; saveChecks(); render(); };
-    card.querySelector('.delete-x').onclick = () => { deleteItem(currentDay, it.idx); };
+    card.querySelector('.checkbox').onclick = () => toggleTask(t);
+    card.querySelector('.delete-x').onclick = () => deleteTaskRow(t.id);
     wrap.appendChild(card);
   });
 }
@@ -773,13 +843,14 @@ function renderBigCards(){
 function renderAccordions(){
   const wrap = document.getElementById('accordionList');
   wrap.innerHTML = '';
-  const otherDays = getDays().filter(d => d.key !== currentDay);
+  const days = getDays();
+  const otherDays = days.filter(d => d.key !== currentDay);
   let any = false;
   otherDays.forEach(d=>{
-    const items = DATA.items[d.key].map((it,i)=>({...it, idx:i})).filter(matchesFilter);
+    const items = itemsForDay(d.key).filter(matchesFilter);
     if(items.length === 0) return;
     any = true;
-    const pending = items.filter(it => !checkedState[itemId(d.key, it.idx)]).length;
+    const pending = items.filter(t => !t.completed).length;
     const collapsed = !!collapsedAccordions[d.key];
     const acc = document.createElement('div');
     acc.className = 'accordion' + (collapsed ? ' collapsed' : '');
@@ -787,38 +858,42 @@ function renderAccordions(){
     head.className = 'accordion-head';
     head.innerHTML = `
       <div class="date-chip" style="background:${d.chip}; color:${d.chipText}">${d.dom}</div>
-      <div class="titles"><div class="d1">${DOW_FULL[d.key]}</div><div class="d2">${pending} pendiente${pending===1?'':'s'}</div></div>
+      <div class="titles"><div class="d1">${d.full.split(' de ')[0]}</div><div class="d2">${pending} pendiente${pending===1?'':'s'}</div></div>
       <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
     `;
     head.onclick = () => { collapsedAccordions[d.key] = !collapsedAccordions[d.key]; render(); };
     acc.appendChild(head);
     const body = document.createElement('div');
     body.className = 'accordion-body';
-    items.forEach(it=>{
-      const id = itemId(d.key, it.idx);
-      const done = !!checkedState[id];
-      const info = TYPE_INFO[it.tipo];
+    items.forEach(t=>{
+      const done = !!t.completed;
+      const info = TYPE_INFO[t.item_type];
+      const color = kidColor(t.kid_id);
       const row = document.createElement('div');
       row.className = 'mini-row' + (done ? ' done' : '');
       row.innerHTML = `
-        <div class="mini-bar ${it.kid}"></div>
+        <div class="mini-bar" style="background:${color.main}"></div>
         <div class="mini-body">
-          <div class="mini-meta"><span class="mini-kid ${it.kid}">${kidLabel(it.kid)}</span><span class="mini-type ${info.cls}">${info.label}</span></div>
-          <div class="mini-title">${it.title}</div>
+          <div class="mini-meta"><span class="mini-kid" style="color:${color.dark}">${kidLabel(t.kid_id)}</span><span class="mini-type ${info.cls}">${info.label}</span></div>
+          <div class="mini-title">${t.title}</div>
         </div>
-        <div class="checkbox ${done ? 'checked' : ''}" data-id="${id}"></div>
+        <div class="checkbox ${done ? 'checked' : ''}" data-id="${t.id}"></div>
       `;
-      row.querySelector('.checkbox').onclick = () => { checkedState[id] = !checkedState[id]; saveChecks(); render(); };
+      row.querySelector('.checkbox').onclick = () => toggleTask(t);
       body.appendChild(row);
     });
     acc.appendChild(body);
     wrap.appendChild(acc);
   });
-  if(!any) wrap.innerHTML = '<div class="empty-state">No hay más pendientes esta semana con este filtro.</div>';
+  if(!any) wrap.innerHTML = '<div class="empty-state">No hay más pendientes esta quincena con este filtro.</div>';
 }
 
 function render(){
   try{
+    const days = getDays();
+    if(!currentDay || !days.find(d=>d.key===currentDay)){
+      currentDay = days.length ? days[0].key : null;
+    }
     renderKidPills();
     renderSummary();
     renderTypeTabs();
@@ -827,34 +902,137 @@ function render(){
     renderBigCards();
     renderAccordions();
   }catch(e){
-    const b = document.getElementById('errorBanner');
-    b.style.display='block'; b.textContent = 'Error al dibujar la app: ' + e.message;
+    showError('Error al dibujar la app: ' + e.message);
   }
 }
 
-async function saveChecks(){ await storageSet(CHECKS_KEY, JSON.stringify(checkedState)); }
-async function saveData(){ await storageSet(DATA_KEY, JSON.stringify(DATA)); }
+/* ---------------- SUPABASE I/O ---------------- */
+async function loadAll(){
+  try{
+    const [{ data: kids, error: kidsErr }, { data: people, error: peopleErr }] = await Promise.all([
+      sb.from('kids').select('*').order('created_at', { ascending: true }),
+      sb.from('people').select('*').order('created_at', { ascending: true }),
+    ]);
+    if(kidsErr) throw kidsErr;
+    if(peopleErr) throw peopleErr;
+    KIDS = kids || [];
+    KIDS_BY_ID = {}; KIDS.forEach(k => KIDS_BY_ID[k.id] = k);
+    PEOPLE = people || [];
+    PEOPLE_BY_ID = {}; PEOPLE.forEach(p => PEOPLE_BY_ID[p.id] = p);
 
-function deleteItem(dayKey, idx){
-  DATA.items[dayKey].splice(idx, 1);
-  // shift checked states for that day since indices changed
-  const newChecked = {};
-  Object.keys(checkedState).forEach(k=>{
-    if(!k.startsWith(dayKey + '-')){ newChecked[k] = checkedState[k]; return; }
-    const oldIdx = parseInt(k.split('-')[1], 10);
-    if(oldIdx < idx) newChecked[k] = checkedState[k];
-    else if(oldIdx > idx) newChecked[dayKey + '-' + (oldIdx - 1)] = checkedState[k];
-  });
-  checkedState = newChecked;
-  saveData(); saveChecks(); render(); renderManageList();
+    const { data: periods, error: periodsErr } = await sb
+      .from('periods').select('*').order('created_at', { ascending: false }).limit(1);
+    if(periodsErr) throw periodsErr;
+    currentPeriod = (periods && periods[0]) || null;
+
+    if(currentPeriod){
+      const { data: tasks, error: tasksErr } = await sb
+        .from('tasks').select('*').eq('period_id', currentPeriod.id).order('created_at', { ascending: true });
+      if(tasksErr) throw tasksErr;
+      TASKS = tasks || [];
+    } else {
+      TASKS = [];
+    }
+    clearError();
+  }catch(e){
+    showError('No se pudo conectar con la base de datos: ' + e.message);
+  }
+}
+
+async function toggleTask(t){
+  const newCompleted = !t.completed;
+  const payload = { completed: newCompleted };
+  if(newCompleted) payload.completed_by_id = currentPerson ? currentPerson.id : null;
+  try{
+    const { data, error } = await sb.from('tasks').update(payload).eq('id', t.id).select().single();
+    if(error) throw error;
+    const idx = TASKS.findIndex(x => x.id === t.id);
+    if(idx >= 0) TASKS[idx] = data;
+    render();
+  }catch(e){
+    showError('No se pudo actualizar: ' + e.message);
+  }
+}
+
+async function deleteTaskRow(id){
+  try{
+    const { error } = await sb.from('tasks').delete().eq('id', id);
+    if(error) throw error;
+    TASKS = TASKS.filter(t => t.id !== id);
+    render();
+    renderManageList();
+  }catch(e){
+    showError('No se pudo eliminar: ' + e.message);
+  }
+}
+
+async function addTaskRow(payload){
+  if(!currentPeriod){
+    showError('Primero guarda las fechas de la quincena.');
+    return;
+  }
+  try{
+    const { data, error } = await sb.from('tasks').insert({
+      period_id: currentPeriod.id,
+      kid_id: payload.kid_id,
+      day_date: payload.day_date,
+      item_type: payload.item_type,
+      subject: payload.subject,
+      title: payload.title,
+      description: payload.description,
+      note: payload.note || null,
+    }).select().single();
+    if(error) throw error;
+    TASKS.push(data);
+    render();
+    renderManageList();
+  }catch(e){
+    showError('No se pudo agregar el pendiente: ' + e.message);
+  }
+}
+
+async function savePeriodMeta(label, start_date, end_date){
+  try{
+    if(currentPeriod){
+      const { data, error } = await sb.from('periods').update({ label, start_date, end_date }).eq('id', currentPeriod.id).select().single();
+      if(error) throw error;
+      currentPeriod = data;
+    }else{
+      const { data, error } = await sb.from('periods').insert({ label, start_date, end_date }).select().single();
+      if(error) throw error;
+      currentPeriod = data;
+    }
+    render();
+  }catch(e){
+    showError('No se pudo guardar la quincena: ' + e.message);
+  }
+}
+
+async function resetPeriod(){
+  if(!confirm('¿Vaciar todos los pendientes de esta quincena y empezar de nuevo? Esta acción no se puede deshacer.')) return;
+  try{
+    const { error } = await sb.rpc('reset_current_period');
+    if(error) throw error;
+    const { data, error: insErr } = await sb.from('periods').insert({
+      label: 'Nueva quincena', start_date: todayStr(), end_date: todayStr(),
+    }).select().single();
+    if(insErr) throw insErr;
+    currentPeriod = data;
+    TASKS = [];
+    render();
+    renderManageList();
+    openUpload();
+  }catch(e){
+    showError('No se pudo vaciar la quincena: ' + e.message);
+  }
 }
 
 /* ---------------- filters / nav ---------------- */
-document.querySelectorAll('.pill').forEach(p=> p.onclick = () => { currentKid = p.dataset.kid; render(); });
 document.querySelectorAll('.type-tab').forEach(t=> t.onclick = () => { currentType = t.dataset.type; render(); });
 document.getElementById('toggleAll').onclick = () => {
-  const anyCollapsed = ['lunes','martes','miercoles','jueves'].some(d => collapsedAccordions[d]);
-  ['lunes','martes','miercoles','jueves'].forEach(d => { collapsedAccordions[d] = !anyCollapsed; });
+  const days = getDays();
+  const anyCollapsed = days.some(d => collapsedAccordions[d.key]);
+  days.forEach(d => { collapsedAccordions[d.key] = !anyCollapsed; });
   render();
 };
 document.querySelectorAll('.nav-item').forEach(n=>{
@@ -867,18 +1045,29 @@ document.querySelectorAll('.nav-item').forEach(n=>{
 document.getElementById('fabBtn').onclick = openUpload;
 document.getElementById('openUploadTop').onclick = openUpload;
 document.getElementById('closeUpload').onclick = closeUpload;
+document.getElementById('avatarBtn').onclick = openWhoModal;
+document.getElementById('whoCloseBtn').onclick = closeWhoModal;
+document.getElementById('whoOtherBtn').onclick = chooseOtherPerson;
+
+function populateKidSelect(){
+  const sel = document.getElementById('fKid');
+  sel.innerHTML = '';
+  KIDS.forEach(k => {
+    const opt = document.createElement('option');
+    opt.value = k.id;
+    opt.textContent = k.name;
+    sel.appendChild(opt);
+  });
+}
 
 function openUpload(){
-  // Open the panel first, no matter what — a problem filling the form
-  // below should never prevent the sheet from showing.
   document.getElementById('uploadView').classList.add('open');
   try{
-    document.getElementById('inputWeekLabel').value = DATA.weekLabel || '';
-    document.getElementById('inputMonthText').value = DATA.monthText || '';
-    document.getElementById('inputDomLunes').value = (DATA.dom && DATA.dom.lunes) || '';
-    document.getElementById('inputDomMartes').value = (DATA.dom && DATA.dom.martes) || '';
-    document.getElementById('inputDomMiercoles').value = (DATA.dom && DATA.dom.miercoles) || '';
-    document.getElementById('inputDomJueves').value = (DATA.dom && DATA.dom.jueves) || '';
+    document.getElementById('inputWeekLabel').value = (currentPeriod && currentPeriod.label) || '';
+    document.getElementById('inputStartDate').value = (currentPeriod && currentPeriod.start_date) || '';
+    document.getElementById('inputEndDate').value = (currentPeriod && currentPeriod.end_date) || '';
+    populateKidSelect();
+    document.getElementById('fDate').value = currentDay || (currentPeriod && currentPeriod.start_date) || todayStr();
   }catch(e){}
   try{ renderManageList(); }catch(e){}
 }
@@ -888,77 +1077,66 @@ function closeUpload(){
 }
 
 document.getElementById('saveDatesBtn').onclick = () => {
-  DATA.weekLabel = document.getElementById('inputWeekLabel').value || DATA.weekLabel;
-  DATA.monthText = document.getElementById('inputMonthText').value || DATA.monthText;
-  DATA.dom.lunes = document.getElementById('inputDomLunes').value || DATA.dom.lunes;
-  DATA.dom.martes = document.getElementById('inputDomMartes').value || DATA.dom.martes;
-  DATA.dom.miercoles = document.getElementById('inputDomMiercoles').value || DATA.dom.miercoles;
-  DATA.dom.jueves = document.getElementById('inputDomJueves').value || DATA.dom.jueves;
-  saveData();
-  alert('Fechas actualizadas.');
+  const label = document.getElementById('inputWeekLabel').value.trim();
+  const start = document.getElementById('inputStartDate').value;
+  const end = document.getElementById('inputEndDate').value;
+  if(!label || !start || !end){ alert('Completa el texto del rango y ambas fechas.'); return; }
+  savePeriodMeta(label, start, end).then(() => alert('Fechas actualizadas.'));
 };
 
 document.getElementById('addItemBtn').onclick = () => {
-  const day = document.getElementById('fDay').value;
-  const kid = document.getElementById('fKid').value;
-  const tipo = document.getElementById('fTipo').value;
+  const day_date = document.getElementById('fDate').value;
+  const kid_id = document.getElementById('fKid').value;
+  const item_type = document.getElementById('fTipo').value;
   const subject = document.getElementById('fSubject').value.trim();
   const title = document.getElementById('fTitle').value.trim();
-  const desc = document.getElementById('fDesc').value.trim();
-  const points = document.getElementById('fPoints').value.trim();
+  const description = document.getElementById('fDesc').value.trim();
+  const note = document.getElementById('fPoints').value.trim();
 
+  if(!day_date){ alert('Selecciona la fecha del pendiente.'); return; }
+  if(!kid_id){ alert('Selecciona a qué hijo pertenece.'); return; }
   if(!title){ alert('Escribe al menos un título para el pendiente.'); return; }
 
-  const newItem = { kid, tipo, subject: subject || 'General', title, desc: desc || '' };
-  if(points) newItem.points = points;
-  DATA.items[day].push(newItem);
-  saveData();
-
-  document.getElementById('fSubject').value = '';
-  document.getElementById('fTitle').value = '';
-  document.getElementById('fDesc').value = '';
-  document.getElementById('fPoints').value = '';
-
-  renderManageList();
+  addTaskRow({ day_date, kid_id, item_type, subject: subject || 'General', title, description, note }).then(() => {
+    document.getElementById('fSubject').value = '';
+    document.getElementById('fTitle').value = '';
+    document.getElementById('fDesc').value = '';
+    document.getElementById('fPoints').value = '';
+  });
 };
 
 function renderManageList(){
   const wrap = document.getElementById('manageList');
   wrap.innerHTML = '';
-  ['lunes','martes','miercoles','jueves'].forEach(dayKey=>{
-    const items = DATA.items[dayKey];
+  const days = getDays();
+  days.forEach(d => {
+    const items = itemsForDay(d.key);
     if(items.length === 0) return;
     const block = document.createElement('div');
     block.className = 'manage-day';
-    block.innerHTML = `<div class="manage-day-title">${DOW_FULL[dayKey]}</div>`;
-    items.forEach((it, idx)=>{
+    block.innerHTML = `<div class="manage-day-title">${d.full}</div>`;
+    items.forEach(t => {
+      const info = TYPE_INFO[t.item_type];
+      const color = kidColor(t.kid_id);
       const row = document.createElement('div');
       row.className = 'manage-row';
-      const info = TYPE_INFO[it.tipo];
       row.innerHTML = `
-        <div class="mini-bar ${it.kid}" style="height:28px;"></div>
+        <div class="mini-bar" style="background:${color.main}; height:28px;"></div>
         <div class="manage-body">
-          <div class="t1">${kidLabel(it.kid)} · ${info.label} · ${it.title}</div>
-          <div class="t2">${it.subject}</div>
+          <div class="t1">${kidLabel(t.kid_id)} · ${info.label} · ${t.title}</div>
+          <div class="t2">${t.subject || ''}</div>
         </div>
         <div class="del">✕</div>
       `;
-      row.querySelector('.del').onclick = () => deleteItem(dayKey, idx);
+      row.querySelector('.del').onclick = () => deleteTaskRow(t.id);
       block.appendChild(row);
     });
     wrap.appendChild(block);
   });
-  if(wrap.innerHTML === '') wrap.innerHTML = '<div class="empty-state">Todavía no hay pendientes esta semana.</div>';
+  if(wrap.innerHTML === '') wrap.innerHTML = '<div class="empty-state">Todavía no hay pendientes en esta quincena.</div>';
 }
 
-document.getElementById('resetBtn').onclick = () => {
-  if(!confirm('¿Vaciar todos los pendientes de la semana? Esta acción no se puede deshacer.')) return;
-  DATA.items = { lunes:[], martes:[], miercoles:[], jueves:[] };
-  checkedState = {};
-  saveData(); saveChecks();
-  renderManageList();
-  render();
-};
+document.getElementById('resetBtn').onclick = resetPeriod;
 
 /* ---------------- PDF text extraction (view-only helper, loaded on demand) ---------------- */
 let pdfJsLoadPromise = null;
@@ -1006,19 +1184,12 @@ document.getElementById('pdfInput').addEventListener('change', async (e) => {
 
 /* ---------------- init ---------------- */
 (async () => {
-  try{
-    const savedData = await storageGet(DATA_KEY);
-    if(savedData){ DATA = JSON.parse(savedData); }
-  }catch(e){}
-  try{
-    const savedChecks = await storageGet(CHECKS_KEY);
-    if(savedChecks){ checkedState = JSON.parse(savedChecks); }
-  }catch(e){}
+  loadStoredPerson();
+  updateAvatarBtn();
+  await loadAll();
   render();
+  if(!currentPerson){ openWhoModal(); }
 })();
-
-// render immediately with defaults too, in case storage is slow, so the screen is never blank
-render();
 </script>
 </body>
 </html>
