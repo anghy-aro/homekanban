@@ -35,12 +35,12 @@
 
     --yellow: #FFD166;
 
-    --material: var(--coral);
-    --material-tint: var(--coral-tint);
-    --tarea: var(--purple);
-    --tarea-tint: var(--purple-tint);
-    --actividad: var(--blue);
-    --actividad-tint: var(--blue-tint);
+    --material: var(--blue-dark);
+    --material-tint: var(--blue-tint);
+    --tarea: var(--green-dark);
+    --tarea-tint: var(--green-tint);
+    --actividad: #B96F1D;
+    --actividad-tint: #FFF1DE;
 
     --radius-lg: 20px;
     --radius-md: 14px;
@@ -160,6 +160,7 @@
     box-shadow: 0 2px 0 rgba(38,33,56,0.06);
   }
   .pill .dot{ width:7px; height:7px; border-radius:50%; background: var(--ink-faint); }
+  .pill .pill-count{ font-weight: 800; opacity: .7; font-size: 12px; }
   .pill.active{ background: linear-gradient(180deg, var(--purple), var(--purple-dark)); color: white; box-shadow: 0 3px 0 rgba(108,63,224,0.35); }
   .pill.active .dot{ background: white; }
 
@@ -242,6 +243,42 @@
   .upcoming-heading{ display:flex; align-items:center; justify-content:space-between; margin: 20px 0 12px; }
   .upcoming-heading h3{ font-size: 14.5px; font-weight: 800; margin:0; }
   .link{ font-size: 12.5px; font-weight: 700; color: var(--purple-dark); cursor:pointer; }
+  .upcoming-total{ font-size: 12.5px; font-weight: 800; color: var(--ink-faint); white-space:nowrap; }
+
+  /* ---------- new card badges / icon / action button ---------- */
+  .badge-group{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+  .badge{ display:flex; align-items:center; gap:4px; font-size:11px; font-weight:800; padding:4px 9px; border-radius:999px; white-space:nowrap; }
+  .time-badge{ font-size:11px; font-weight:800; color: var(--ink-faint); white-space:nowrap; flex:none; margin-left:8px; text-align:right; }
+
+  .card-body-row{ display:flex; gap:11px; margin-bottom:12px; }
+  .icon-circle{ width:44px; height:44px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:20px; flex:none; }
+  .card-text{ flex:1; min-width:0; }
+
+  .mark-btn{
+    width:100%; display:flex; align-items:center; justify-content:center; gap:8px;
+    border:1.6px solid var(--line); background:var(--paper); border-radius:12px; padding:11px; cursor:pointer;
+    font-family:inherit; font-size:13px; font-weight:800;
+  }
+  .mark-btn.material{ border-color: var(--material); color: var(--material); }
+  .mark-btn.tarea{ border-color: var(--tarea); color: var(--tarea); }
+  .mark-btn.actividad{ border-color: var(--actividad); color: var(--actividad); }
+  .mark-btn .mark-checkbox{
+    width:18px; height:18px; border-radius:6px; border:1.6px solid currentColor; display:flex; align-items:center; justify-content:center; font-size:11px; flex:none;
+  }
+  .mark-btn.done{ background: var(--green-tint); border-color: var(--green); color: var(--green-dark); }
+  .mark-btn.done .mark-checkbox{ background: var(--green); border-color: var(--green); color:white; }
+
+  /* ---------- consolidated upcoming-days list ---------- */
+  .upcoming-group{ background:var(--paper); border:1px solid var(--line); border-radius: var(--radius-md); margin-bottom:10px; overflow:hidden; }
+  .upcoming-group-head{ display:flex; align-items:center; justify-content:space-between; padding:11px 13px; font-size:12.5px; font-weight:800; background:#FAFBFC; border-bottom:1px solid var(--line); }
+  .upcoming-group-head .muted{ color: var(--ink-faint); font-weight:700; }
+  .upcoming-row{ display:flex; align-items:center; gap:9px; padding:10px 13px; border-bottom:1px solid var(--line); cursor:pointer; }
+  .upcoming-row:last-child{ border-bottom:none; }
+  .upcoming-row.done .row-title{ text-decoration: line-through; color: var(--ink-faint); }
+  .dot-sm{ width:7px; height:7px; border-radius:50%; flex:none; }
+  .kid-chip-sm{ font-size:10.5px; font-weight:800; padding:2px 7px; border-radius:999px; flex:none; }
+  .row-title{ flex:1; min-width:0; font-size:12.5px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .row-icon{ font-size:14px; flex:none; }
 
   .accordion{ background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-md); margin-bottom: 10px; overflow: hidden; }
   .accordion-head{ display:flex; align-items:center; gap: 11px; padding: 12px 13px; cursor:pointer; }
@@ -392,13 +429,11 @@
 
     <div class="kid-pills" id="kidPills"></div>
 
-    <div class="summary-row" id="summaryRow"></div>
-
     <div class="type-tabs" id="typeTabs">
       <div class="type-tab active" data-type="all">Todo</div>
-      <div class="type-tab" data-type="material">📦 Materiales</div>
+      <div class="type-tab" data-type="material">🎒 Materiales</div>
       <div class="type-tab" data-type="tarea">✏️ Tareas</div>
-      <div class="type-tab" data-type="actividad">⭐ Actividades</div>
+      <div class="type-tab" data-type="actividad">🎨 Actividades</div>
     </div>
   </header>
 
@@ -421,8 +456,8 @@
     <div id="bigCards"></div>
 
     <div class="upcoming-heading">
-      <h3>Próximos días de la semana</h3>
-      <div class="link" id="toggleAll">Vista extendida</div>
+      <h3>🗓️ Próximos días de la semana</h3>
+      <div class="upcoming-total" id="upcomingCount">0 pendientes más</div>
     </div>
 
     <div id="accordionList"></div>
@@ -570,10 +605,45 @@ const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const PERSON_KEY = 'homekanban-person-v1';
 
 const TYPE_INFO = {
-  material:  { label:'Material',  cls:'material',  checkLabel:'Listo en mochila', context:'Antes de la clase' },
-  tarea:     { label:'Tarea',     cls:'tarea',      checkLabel:'Completado',        context:'Revisar esta noche' },
-  actividad: { label:'Actividad', cls:'actividad',  checkLabel:'Confirmado',        context:'Preparar con anticipación' },
+  material:  { label:'Material',  cls:'material',  icon:'🎒', tint:'var(--material-tint)' },
+  tarea:     { label:'Tarea',     cls:'tarea',      icon:'✏️', tint:'var(--tarea-tint)' },
+  actividad: { label:'Actividad', cls:'actividad',  icon:'🎨', tint:'var(--actividad-tint)' },
 };
+
+const SUBJECT_ICON_RULES = [
+  [/matem[aá]t/i, '📐'],
+  [/spelling|language arts|comunicaci[oó]n y lenguaje|writing|reading/i, '📝'],
+  [/nataci[oó]n/i, '🏊'],
+  [/geograf/i, '🗺️'],
+  [/conocimiento de su mundo/i, '🌎'],
+  [/destrezas/i, '🔢'],
+  [/caligraf/i, '✍️'],
+  [/devocional|orientaci[oó]n cristiana|escuela para padres|iglesia/i, '🙏'],
+  [/educaci[oó]n f[ií]sica|deporte/i, '⚽'],
+  [/arte|manualidad/i, '🖌️'],
+  [/m[uú]sica/i, '🎵'],
+];
+function itemIcon(t){
+  const hay = ((t.subject||'') + ' ' + (t.title||'')).toLowerCase();
+  for(const [re, icon] of SUBJECT_ICON_RULES){ if(re.test(hay)) return icon; }
+  return (TYPE_INFO[t.item_type] && TYPE_INFO[t.item_type].icon) || '📌';
+}
+function actionLabel(t){
+  if(t.item_type === 'material') return 'Marcar como listo en mochila';
+  if(t.item_type === 'tarea') return 'Marcar tarea completada';
+  if(t.item_type === 'actividad') return 'Listo en la bolsa de ' + kidLabel(t.kid_id);
+  return 'Marcar completado';
+}
+function relativeDayLabel(t){
+  const dToday = parseLocalDate(todayStr());
+  const d = parseLocalDate(t.day_date);
+  const diff = Math.round((d - dToday) / 86400000);
+  const verb = t.item_type === 'tarea' ? 'Para' : 'Llevar';
+  if(diff === 0) return t.item_type === 'tarea' ? 'Para hoy' : 'Llevar hoy';
+  if(diff === 1) return verb + ' mañana';
+  if(diff < 0) return 'Atrasado';
+  return verb + ' el ' + DOW_FULL[d.getDay()] + ' ' + d.getDate();
+}
 
 const DOW_FULL = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
 const DOW_SHORT = ['DOM','LUN','MAR','MIÉ','JUE','VIE','SÁB'];
@@ -599,10 +669,10 @@ let currentPeriod = null;  // {id, label, start_date, end_date}
 let TASKS = [];            // task rows for currentPeriod
 
 let currentPerson = null;  // {id, name} or null
+let currentView = 'semana'; // 'semana' | 'mochila'
 let currentKid = 'all';
 let currentType = 'all';
 let currentDay = null;     // 'YYYY-MM-DD'
-let collapsedAccordions = {};
 
 /* ---------------- utils ---------------- */
 function parseLocalDate(dateStr){
@@ -724,15 +794,19 @@ async function chooseOtherPerson(){
 function renderKidPills(){
   const wrap = document.getElementById('kidPills');
   wrap.innerHTML = '';
+  const byType = t => currentType === 'all' || t.item_type === currentType;
+  const allCount = TASKS.filter(byType).length;
+
   const allPill = document.createElement('div');
   allPill.className = 'pill' + (currentKid === 'all' ? ' active' : '');
-  allPill.innerHTML = '<span class="dot"></span>Todos';
+  allPill.innerHTML = '<span class="dot"></span>Todos <span class="pill-count">(' + allCount + ')</span>';
   allPill.onclick = () => { currentKid = 'all'; render(); };
   wrap.appendChild(allPill);
 
   KIDS.forEach(k => {
     const color = kidColor(k.id);
     const active = currentKid === k.id;
+    const count = TASKS.filter(t => t.kid_id === k.id && byType(t)).length;
     const pill = document.createElement('div');
     pill.className = 'pill' + (active ? ' active' : '');
     if(active){
@@ -740,23 +814,10 @@ function renderKidPills(){
       pill.style.boxShadow = '0 3px 0 ' + color.dark + '55';
       pill.style.color = 'white';
     }
-    pill.innerHTML = '<span class="dot" style="background:' + (active ? 'white' : color.main) + '"></span>' + k.name;
+    pill.innerHTML = '<span class="dot" style="background:' + (active ? 'white' : color.main) + '"></span>' + k.name + ' <span class="pill-count">(' + count + ')</span>';
     pill.onclick = () => { currentKid = k.id; render(); };
     wrap.appendChild(pill);
   });
-}
-
-function renderSummary(){
-  const el = document.getElementById('summaryRow');
-  const byType = t => currentType === 'all' || t.item_type === currentType;
-  const allCount = TASKS.filter(byType).length;
-  let html = '<div class="item"><span>Todos <span class="count">(' + allCount + ')</span></span></div>';
-  KIDS.forEach(k => {
-    const color = kidColor(k.id);
-    const count = TASKS.filter(t => t.kid_id === k.id && byType(t)).length;
-    html += '<div class="item"><span class="sw" style="background:' + color.main + '"></span>' + k.name + ' <span class="count">' + count + '</span></div>';
-  });
-  el.innerHTML = html;
 }
 
 function renderTypeTabs(){
@@ -770,7 +831,7 @@ function renderDaySelector(){
     const box = document.createElement('div');
     box.className = 'day-box' + (d.key===currentDay ? ' active' : '');
     const c = dayCounts(d.key);
-    box.innerHTML = '<div class="dow">'+d.dow+'</div><div class="dom">'+d.dom+'</div><div class="cnt">'+c+' item'+(c===1?'':'s')+'</div>';
+    box.innerHTML = '<div class="dow">'+d.dow+'</div><div class="dom">'+d.dom+'</div><div class="cnt">'+c+' cosa'+(c===1?'':'s')+'</div>';
     box.onclick = () => { currentDay = d.key; render(); };
     wrap.appendChild(box);
   });
@@ -809,83 +870,107 @@ function renderBigCards(){
     const done = !!t.completed;
     const info = TYPE_INFO[t.item_type];
     const color = kidColor(t.kid_id);
-    const card = document.createElement('div');
-    card.className = 'big-card' + (done ? ' done' : '');
-    card.style.borderLeftColor = color.main;
     const doneName = done ? personName(t.completed_by_id) : null;
+    const card = document.createElement('div');
+    card.className = 'big-card ' + info.cls + (done ? ' done' : '');
+    card.style.borderLeftColor = color.main;
     card.innerHTML = `
       <div class="delete-x" data-id="${t.id}">✕</div>
       <div class="big-card-top">
-        <div class="kid-tag" style="color:${color.dark}"><span class="av" style="background:${color.tint}">${kidAvatar(t.kid_id)}</span>${kidLabel(t.kid_id)}</div>
-        <div class="type-badge ${info.cls}">${info.label.toUpperCase()}</div>
-      </div>
-      <div class="subject">${t.subject || ''}</div>
-      <div class="title">${t.title}</div>
-      <div class="desc">${t.description || ''}${t.note ? ' <strong>· '+t.note+'</strong>' : ''}</div>
-      <div class="big-card-bottom">
-        <div class="context-line">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-          ${info.context}
-          <span class="status-pill ${done ? 'done' : 'pending'}">${done ? ('Listo' + (doneName ? ' · '+doneName : '')) : 'Pendiente'}</span>
+        <div class="badge-group">
+          <span class="badge kid-badge" style="background:${color.tint}; color:${color.dark}">${kidAvatar(t.kid_id)} ${kidLabel(t.kid_id)}</span>
+          <span class="badge type-badge ${info.cls}">${info.icon} ${info.label}</span>
         </div>
-        <div class="check-row">
-          <span class="check-label">${info.checkLabel}</span>
-          <div class="checkbox ${done ? 'checked' : ''}" data-id="${t.id}"></div>
+        <span class="time-badge">${relativeDayLabel(t)}</span>
+      </div>
+      <div class="card-body-row">
+        <div class="icon-circle" style="background:${info.tint}">${itemIcon(t)}</div>
+        <div class="card-text">
+          <div class="subject">${t.subject || ''}</div>
+          <div class="title">${t.title}</div>
+          <div class="desc">${t.description || ''}${t.note ? ' <strong>· '+t.note+'</strong>' : ''}</div>
         </div>
       </div>
+      <button class="mark-btn ${info.cls} ${done ? 'done' : ''}" data-id="${t.id}">
+        <span class="mark-checkbox">${done ? '✓' : ''}</span>
+        ${done ? ('Listo' + (doneName ? ' · '+doneName : '')) : actionLabel(t)}
+      </button>
     `;
-    card.querySelector('.checkbox').onclick = () => toggleTask(t);
+    card.querySelector('.mark-btn').onclick = () => toggleTask(t);
     card.querySelector('.delete-x').onclick = () => deleteTaskRow(t.id);
     wrap.appendChild(card);
   });
 }
 
-function renderAccordions(){
+function renderUpcoming(){
   const wrap = document.getElementById('accordionList');
   wrap.innerHTML = '';
   const days = getDays();
   const otherDays = days.filter(d => d.key !== currentDay);
+
+  let totalPending = 0;
+  otherDays.forEach(d => { totalPending += itemsForDay(d.key).filter(matchesFilter).filter(t=>!t.completed).length; });
+  const countEl = document.getElementById('upcomingCount');
+  if(countEl) countEl.textContent = totalPending + ' pendiente' + (totalPending===1?'':'s') + ' más';
+
+  if(otherDays.length === 0){
+    wrap.innerHTML = '<div class="empty-state">No hay más pendientes esta quincena con este filtro.</div>';
+    return;
+  }
+
+  // consolidate: the very next day stands alone, the rest of the week is grouped together
+  const groups = [ [otherDays[0]] ];
+  if(otherDays.length > 1) groups.push(otherDays.slice(1));
+
   let any = false;
-  otherDays.forEach(d=>{
-    const items = itemsForDay(d.key).filter(matchesFilter);
-    if(items.length === 0) return;
+  groups.forEach(groupDays => {
+    const groupItems = [];
+    groupDays.forEach(d => { itemsForDay(d.key).filter(matchesFilter).forEach(t => groupItems.push(t)); });
+    if(groupItems.length === 0) return;
     any = true;
-    const pending = items.filter(t => !t.completed).length;
-    const collapsed = !!collapsedAccordions[d.key];
-    const acc = document.createElement('div');
-    acc.className = 'accordion' + (collapsed ? ' collapsed' : '');
-    const head = document.createElement('div');
-    head.className = 'accordion-head';
-    head.innerHTML = `
-      <div class="date-chip" style="background:${d.chip}; color:${d.chipText}">${d.dom}</div>
-      <div class="titles"><div class="d1">${d.full.split(' de ')[0]}</div><div class="d2">${pending} pendiente${pending===1?'':'s'}</div></div>
-      <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
-    `;
-    head.onclick = () => { collapsedAccordions[d.key] = !collapsedAccordions[d.key]; render(); };
-    acc.appendChild(head);
+
+    const headerParts = groupDays.map(d => d.full.split(' de ')[0]);
+    let headerText;
+    if(headerParts.length === 1) headerText = headerParts[0];
+    else headerText = headerParts.slice(0, -1).join(', ') + ' & ' + headerParts[headerParts.length - 1];
+
+    const group = document.createElement('div');
+    group.className = 'upcoming-group';
+    group.innerHTML = `<div class="upcoming-group-head"><span>${headerText}</span><span class="muted">${groupItems.length} cosa${groupItems.length===1?'':'s'}</span></div>`;
     const body = document.createElement('div');
-    body.className = 'accordion-body';
-    items.forEach(t=>{
-      const done = !!t.completed;
-      const info = TYPE_INFO[t.item_type];
+    body.className = 'upcoming-group-body';
+    groupItems.forEach(t=>{
       const color = kidColor(t.kid_id);
       const row = document.createElement('div');
-      row.className = 'mini-row' + (done ? ' done' : '');
+      row.className = 'upcoming-row' + (t.completed ? ' done' : '');
       row.innerHTML = `
-        <div class="mini-bar" style="background:${color.main}"></div>
-        <div class="mini-body">
-          <div class="mini-meta"><span class="mini-kid" style="color:${color.dark}">${kidLabel(t.kid_id)}</span><span class="mini-type ${info.cls}">${info.label}</span></div>
-          <div class="mini-title">${t.title}</div>
-        </div>
-        <div class="checkbox ${done ? 'checked' : ''}" data-id="${t.id}"></div>
+        <span class="dot-sm" style="background:${color.main}"></span>
+        <span class="kid-chip-sm" style="background:${color.tint}; color:${color.dark}">${kidLabel(t.kid_id)}</span>
+        <span class="row-title">${t.title}</span>
+        <span class="row-icon">${itemIcon(t)}</span>
       `;
-      row.querySelector('.checkbox').onclick = () => toggleTask(t);
+      row.onclick = () => { currentDay = t.day_date; render(); window.scrollTo({ top: 0, behavior: 'smooth' }); };
       body.appendChild(row);
     });
-    acc.appendChild(body);
-    wrap.appendChild(acc);
+    group.appendChild(body);
+    wrap.appendChild(group);
   });
   if(!any) wrap.innerHTML = '<div class="empty-state">No hay más pendientes esta quincena con este filtro.</div>';
+}
+
+function renderViewChrome(){
+  const isMochila = currentView === 'mochila';
+  const eyebrow = document.querySelector('.eyebrow');
+  const h1 = document.querySelector('header h1');
+  const subtitle = document.querySelector('.subtitle-line');
+  const tabsEl = document.getElementById('typeTabs');
+  if(eyebrow) eyebrow.textContent = isMochila ? 'MOCHILAS' : 'SEMANA ACTUAL';
+  if(h1) h1.textContent = isMochila ? 'Mochila' : 'Semana';
+  if(subtitle) subtitle.textContent = isMochila ? 'Materiales para llevar esta quincena' : 'Tareas · Materiales · Actividades de la semana';
+  if(tabsEl) tabsEl.style.display = isMochila ? 'none' : 'flex';
+  document.querySelectorAll('.nav-item').forEach(n => {
+    n.classList.toggle('active', n.dataset.nav === (isMochila ? 'mochilas' : 'semana'));
+  });
 }
 
 function render(){
@@ -894,13 +979,13 @@ function render(){
     if(!currentDay || !days.find(d=>d.key===currentDay)){
       currentDay = days.length ? days[0].key : null;
     }
+    renderViewChrome();
     renderKidPills();
-    renderSummary();
     renderTypeTabs();
     renderDaySelector();
     renderTotalPill();
     renderBigCards();
-    renderAccordions();
+    renderUpcoming();
   }catch(e){
     showError('Error al dibujar la app: ' + e.message);
   }
@@ -1029,15 +1114,10 @@ async function resetPeriod(){
 
 /* ---------------- filters / nav ---------------- */
 document.querySelectorAll('.type-tab').forEach(t=> t.onclick = () => { currentType = t.dataset.type; render(); });
-document.getElementById('toggleAll').onclick = () => {
-  const days = getDays();
-  const anyCollapsed = days.some(d => collapsedAccordions[d.key]);
-  days.forEach(d => { collapsedAccordions[d.key] = !anyCollapsed; });
-  render();
-};
 document.querySelectorAll('.nav-item').forEach(n=>{
   n.onclick = () => {
-    if(n.dataset.nav === 'semana') return;
+    if(n.dataset.nav === 'semana'){ currentView = 'semana'; currentType = 'all'; render(); return; }
+    if(n.dataset.nav === 'mochilas'){ currentView = 'mochila'; currentType = 'material'; render(); return; }
     if(n.dataset.nav === 'pdfs'){ openUpload(); return; }
     alert('Esta sección todavía no está disponible en la vista previa.');
   };
